@@ -25,4 +25,8 @@
 # or
 #DEFAULT (echo ""; id; echo %{sVv}; date; cat) >> $CVSROOT/CVSROOT/commitlog
 
-DEFAULT $CVSROOT/CVSROOT/syncmail -u %{sVv} mattbee@users.sf.net ralph@users.sf.net
+DEFAULT $CVSROOT/CVSROOT/syncmail -u %{sVv} \
+    cth103@users.sf.net \
+    mattbee@users.sf.net \
+    ralph@users.sf.net \
+
