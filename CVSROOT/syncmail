@@ -39,6 +39,12 @@ Where options is:
     -h
         Print this text.
 
+    -d
+        Don't produce diffs.
+
+    -s
+        Produce a summary of file names and revisions.
+
     --context=#
     -C #
         Include # lines of context around lines that differ (default: 2).
@@ -87,6 +93,21 @@ def usage(code, msg=''):
 
 
 
+def format_file(filespec):
+    try:
+        file, oldrev, newrev = string.split(filespec, ',')
+    except ValueError:
+        # No diff to report
+        return '***** Bogus filespec: %s' % filespec
+    if oldrev == 'NONE':
+        return 'create %-14s %6s' % (file, newrev)
+    if newrev == 'NONE':
+        return 'delete %-14s %6s' % (file, oldrev)
+
+    return 'modify %-14s %6s %6s' % (file, oldrev, newrev)
+
+
+
 def calculate_diff(filespec, contextlines):
     try:
         file, oldrev, newrev = string.split(filespec, ',')
@@ -132,7 +153,7 @@ def calculate_diff(filespec, contextlines):
 
 
 
-def blast_mail(mailcmd, filestodiff, contextlines):
+def blast_mail(mailcmd, filestodiff, wantsummary, wantdiffs, contextlines):
     # cannot wait for child process or that will cause parent to retain cvs
     # lock for too long.  Urg!
     if not os.fork():
@@ -142,10 +163,16 @@ def blast_mail(mailcmd, filestodiff, contextlines):
         fp = os.popen(mailcmd, 'w')
         fp.write(sys.stdin.read())
         fp.write('\n')
-        # append the diffs if available
-        for file in filestodiff:
-            fp.write(calculate_diff(file, contextlines))
+        if wantsummary:
+            fp.write('Files changed:\n')
+            for file in filestodiff:
+                fp.write('    %s\n' % format_file(file))
             fp.write('\n')
+        # append the diffs if available
+        if wantdiffs:
+            for file in filestodiff:
+                fp.write(calculate_diff(file, contextlines))
+                fp.write('\n')
         fp.close()
         # doesn't matter what code we return, it isn't waited on
         os._exit(0)
@@ -154,9 +181,11 @@ def blast_mail(mailcmd, filestodiff, contextlines):
 
 # scan args for options
 def main():
+    wantdiffs = 1
+    wantsummary = 0
     contextlines = 2
     try:
-        opts, args = getopt.getopt(sys.argv[1:], 'hC:cu',
+        opts, args = getopt.getopt(sys.argv[1:], 'hdsC:cu',
                                    ['context=', 'cvsroot=', 'help'])
     except getopt.error, msg:
         usage(1, msg)
@@ -167,6 +196,10 @@ def main():
             usage(0)
         elif opt == '--cvsroot':
             os.environ['CVSROOT'] = arg
+        elif opt == '-d':
+            wantdiffs = 0
+        elif opt == '-s':
+            wantsummary = 1
         elif opt in ('-C', '--context'):
             contextlines = int(arg)
         elif opt == '-c':
@@ -182,6 +215,8 @@ def main():
     if not args:
         usage(1, 'No CVS module specified')
     SUBJECT = args[0]
+    if len(SUBJECT) > 70:
+        SUBJECT = SUBJECT[:70] + '...'
     specs = string.split(args[0])
     del args[0]
 
@@ -208,7 +243,7 @@ def main():
                 L.append(s)
         specs = L
     print 'Generating notification message...'
-    blast_mail(mailcmd, specs[1:], contextlines)
+    blast_mail(mailcmd, specs[1:], wantsummary, wantdiffs, contextlines)
     print 'Generating notification message... done.'
 
 
