@@ -384,7 +384,14 @@ os_error *xos_control (void *error_handler,
       void **old_escape_handler,
       void **old_event_handler)
 {
-  return ERR_NO_SUCH_SWI();
+  os_error *e = NULL;
+  byte *or12, *ob;;
+
+  e = e ? e : xos_change_environment(6, error_handler, NULL, (byte*) error_buffer, old_error_handler, &or12, (byte**) old_error_buffer);
+  e = e ? e : xos_change_environment(9, escape_handler, NULL, NULL, old_escape_handler, &or12, &ob);
+  e = e ? e : xos_change_environment(10, event_handler, NULL, NULL, old_event_handler, &or12, &ob);
+
+  return e;
 }
 
 /* ------------------------------------------------------------------------
