@@ -176,6 +176,7 @@ ARMul_OSHandleSWI(ARMul_State *state, ARMword number)
       abort();
   }
   else {
+      rsp_check_swi(number);
       swi_trap(number);
   }
   return 1; /* tells ARMulator not to try OS SWI trap */

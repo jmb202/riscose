@@ -33,6 +33,7 @@ extern void  handle_rsp ();
 extern void  rsp_exception (unsigned long int  except);
 
 extern void  rsp_check_instruction ( ARMword pc );
+extern void  rsp_check_swi ( ARMword nuber );
 extern void  rsp_check_memory_read( ARMword addr );
 extern void  rsp_check_memory_write( ARMword addr );
 

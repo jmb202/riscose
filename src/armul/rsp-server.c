@@ -45,6 +45,7 @@
 #include <signal.h>
 #include <string.h>
 #include <assert.h>
+#include <stdbool.h>
 
 /* Define to log each packet */
 #define RSP_TRACE  0
@@ -121,6 +122,7 @@ static struct
   int                client_fd;		/*!< FD for talking to GDB */
   int                sigval;		/*!< GDB signal for any exception */
   struct mp_entry   *mp_hash[MP_HASH_SIZE];	/*!< Matchpoint hash table */
+  bool               catch_syscalls;
 } rsp;
 
 /* Forward declarations of static functions */
@@ -206,6 +208,7 @@ rsp_init ()
   rsp.stalled        =  0;
   rsp.client_fd      = -1;		/* i.e. invalid */
   rsp.sigval         =  0;		/* No exception */
+  rsp.catch_syscalls = false;
 
   /* Set up the matchpoint hash table */
   mp_hash_init ();
@@ -1640,7 +1643,7 @@ rsp_query (struct rsp_buf *buf)
 
       char  reply[GDB_BUF_MAX];
 
-      sprintf (reply, "PacketSize=%x;xmlRegisters=arm;swbreak-;hwbreak+;qXfer:features:read+;qXfer:auxv:read+;qHostInfo:+;vContSupported+", GDB_BUF_MAX);
+      sprintf (reply, "PacketSize=%x;xmlRegisters=arm;swbreak-;hwbreak+;qXfer:features:read+;qXfer:auxv:read+;qHostInfo:+;vContSupported+;QCatchSyscalls+", GDB_BUF_MAX);
       put_str_packet (reply);
     }
   else if (0 == strncmp ("qSymbol:", buf->data, strlen ("qSymbol:")))
@@ -1718,6 +1721,12 @@ rsp_query (struct rsp_buf *buf)
 
       put_str_packet ("");
     }
+  }
+  else if (strcmp(buf->data, "QCatchSyscalls:1") == 0) {
+    rsp.catch_syscalls = true;
+  }
+  else if (strcmp(buf->data, "QCatchSyscalls:0") == 0) {
+    rsp.catch_syscalls = false;
   }
   else
     {
@@ -2095,6 +2104,14 @@ extern void  rsp_check_instruction ( ARMword pc ) {
         }
     }
 }
+
+extern void  rsp_check_swi ( ARMword number ) {
+    if (rsp.catch_syscalls) {
+        rsp.sigval = TARGET_SIGNAL_TRAP;
+        handle_rsp();
+    }
+}
+
 
 extern void  rsp_check_memory_read( ARMword addr ) {
     int m = mp_hash_lookup( WP_READ, addr )
