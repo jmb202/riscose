@@ -677,20 +677,21 @@ SWI
          FLAGS!
    )  );
 
-SWI OS_Control =
-   (  NUMBER 0xF "Reads/writes handler addresses - prefer OS_ChangeEnvironment",
-      ENTRY
-      (  R0 -> .Asm: error_handler,
-         R1 = .Ref OS_Error: error_buffer,
-         R2 -> .Asm: escape_handler,
-         R3 -> .Asm: event_handler
-      ),
-      EXIT
-      (  R0 -> .Asm: old_error_handler,
-         R1 = .Ref OS_Error: old_error_buffer,
-         R2 -> .Asm: old_escape_handler,
-         R3 -> .Asm: old_event_handler
-   )  );
+
+//SWI OS_Control =
+//   (  NUMBER 0xF "Reads/writes handler addresses - prefer OS_ChangeEnvironment",
+//      ENTRY
+//      (  R0 -> .Asm: error_handler,
+//         R1 = .Ref OS_Error: error_buffer,
+//         R2 -> .Asm: escape_handler,
+//         R3 -> .Asm: event_handler
+//      ),
+//      EXIT
+//      (  R0 -> .Asm: old_error_handler,
+//         R1 = .Ref OS_Error: old_error_buffer,
+//         R2 -> .Asm: old_escape_handler,
+//         R3 -> .Asm: old_event_handler
+//   )  );
 
 SWI OS_GetEnv =
    (  NUMBER 0x10 "Reads environment parameters",

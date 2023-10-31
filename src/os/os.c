@@ -24,9 +24,19 @@
 #include "arm.h"
 #include "swi.h"
 #include "rom/rom.h"
+#include "riscose.h"
 
 // From crcany
 #include "crc16arc.h"
+
+os_error *xos_control (void *error_handler,
+      os_error *error_buffer,
+      void *escape_handler,
+      void *event_handler,
+      void **old_error_handler,
+      os_error **old_error_buffer,
+      void **old_escape_handler,
+      void **old_event_handler);
 
 static const int Sys$RCLimit = 256;
 
@@ -57,15 +67,52 @@ os_error* os_write_s(WORD n)
   return 0;
 }
 
+static os_error* swih_os_control(WORD n)
+{
+  char* r0 = NULL;
+  char* r1 = NULL;
+  char* r2 = NULL;
+  char* r3 = NULL;
+  os_error *e;
+
+    DEBUG(SWI, ("os_control\n"));
+    DEBUG(SWI, ("  In: r0 = %x\n", ARM_R0));
+    DEBUG(SWI, ("  In: r1 = %x\n", ARM_R1));
+    DEBUG(SWI, ("  In: r2 = %x\n", ARM_R2));
+    DEBUG(SWI, ("  In: r3 = %x\n", ARM_R3));
+
+  // Code seen in the wild calls OS_Control with stray PSR bits set in R0.
+  e = xos_control((void *) MEM_TOHOST(ARM_R0 & 0x7ffffffc),
+      (os_error *) MEM_TOHOST(ARM_R1 & 0x7ffffffc),
+      (void *) MEM_TOHOST(ARM_R2 & 0x7ffffffc),
+      (void *) MEM_TOHOST(ARM_R3 & 0x7ffffffc),
+      (void **) &r0,
+      (os_error **) &r1,
+      (void **) &r2,
+      (void **) &r3);
+
+    DEBUG(SWI, ("  Out: r0 = %x\n", MEM_TOARM((void *)r0)));
+    DEBUG(SWI, ("  Out: r1 = %x\n", MEM_TOARM((void *)r1)));
+    DEBUG(SWI, ("  Out: r2 = %x\n", MEM_TOARM((void *)r2)));
+    DEBUG(SWI, ("  Out: r3 = %x\n", MEM_TOARM((void *)r3)));
+
+  if (e)
+    return e;
+  ARM_SET_R0(MEM_TOARM((void *)r0));
+  ARM_SET_R1(MEM_TOARM((void *)r1));
+  ARM_SET_R2(MEM_TOARM((void *)r2));
+  ARM_SET_R3(MEM_TOARM((void *)r3));
+  return 0;
+}
+
+
 void os_swi_register_extra(void)
 {
   swi_register(0x1, "OS_WriteS", os_write_s);
   swi_register(0x6f, "OS_CallASWI", os_call_a_swi);
   swi_register(0x71, "OS_CallASWIR12", os_call_a_swi_r12);
+  swi_register(0xf, "OS_Control", swih_os_control);
 }
-
-
-
 
 /* ------------------------------------------------------------------------
  * Function:      os_read_var_val_size()
