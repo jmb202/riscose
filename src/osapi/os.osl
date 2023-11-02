@@ -574,7 +574,7 @@ SWI
    OS_WriteS = (NUMBER 1 "Writes the following string to all of the
          active output streams - cannot be called via APCS", ABSENT),
    OS_Write0 = (NUMBER 2 "Writes a string to all of the active output
-         streams", ENTRY (R0 -> .String: s), EXIT (R0?)),
+         streams", ENTRY (R0 -> .String: s), EXIT (R0 -> .String: t)),
    OS_NewLine = (NUMBER 3 "Writes a line feed followed by a carriage
          return to all of the active output streams"),
    OS_ReadC = (NUMBER 4 "Reads a character from the input stream",

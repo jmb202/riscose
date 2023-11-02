@@ -175,11 +175,13 @@ os_error *xos_writec (char c)
  * Other notes:   Emulation of SWI 0x2.
  */
 
-os_error *xos_write0 (char *s)
+os_error *xos_write0 (char *s, char **t)
 {
 
   while (*s)
     vdu(*(s++));
+
+  *t = s+1;
 
   return 0;
 }
