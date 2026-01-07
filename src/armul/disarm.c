@@ -60,10 +60,24 @@
  *                    (Thanks to Vincent Zweije for reporting this.)
  */
 
+/* changes for riscose:
+ *
+ * 0. add this changelog
+ * 1. extract type definitions into disarm.h
+ * 2. include disarm.h
+ * 3. wrap unwanted functionality in #ifdef NOT_FOR_RISCOSE
+ *    specifically:
+ *      * the type definitions -- now in disarm.h
+ *      * disassemble(), main(), swiname(), reg_names, and options
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "disarm.h"
+
+#ifdef NOT_FOR_RISCOSE
 typedef unsigned long word;
 typedef unsigned long address;
 typedef unsigned long addrdiff;
@@ -111,6 +125,7 @@ defstruct(DisOptions) {
 };
 
 static pInstruction instr_disassemble(word, address, pDisOptions);
+#endif
 
 #define INSTR_grok_v4
 
@@ -910,6 +925,7 @@ lPling:
   return &result;
 }
 
+#ifdef NOT_FOR_RISCOSE
 static char * reg_names[16] = {
   "r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
   "r8", "r9", "r10", "r11", "ip", "sp", "lr", "pc"
@@ -982,3 +998,4 @@ extern int main(int ac, const char * av[]) {
 
   return 0;
 }
+#endif
