@@ -52,6 +52,7 @@ arm_init(void)
   int dummyInstr;
   
   ARMul_EmulateInit();
+
   arm = ARMul_NewState();
     for (dummyInstr = 0; dummyInstr < 16; dummyInstr++) {
         arm->LDC[dummyInstr] = (ARMul_LDCs *)arm_unsupported_instruction;
@@ -62,15 +63,18 @@ arm_init(void)
     }
   ARMul_SelectProcessor(arm, ARM2);
   ARMul_Reset(arm);
-  ARMul_SwitchMode(arm, SVC26MODE, USER26MODE);
-  ARMul_SetR15(arm, (arm->Reg[15] & 0xfffffffc));
-  ARMul_R15Altered(arm);
+
+  /* Expect to be in SVC mode */
+  assert(arm->Mode == 3 && (arm_get_r15_all() & 3) == 3);
+  /* Set up SVC mode stack */
+  arm_set_reg(13, MMAP_SVCSTACK_BASE+MMAP_SVCSTACK_SIZE);
+
+  /* Drop into USR mode */
+  ARMul_SetR15(arm, arm_get_r15_all() & ~3);
+  assert(arm->Mode == 0 && (arm_get_r15_all() & 3) == 0);
+
   arm_run_depth=0;
 
-  /* Set SVC mode stack */
-  arm_set_reg(15, 0x8003);
-  arm_set_reg(13, MMAP_SVCSTACK_BASE+MMAP_SVCSTACK_SIZE);
-  arm_set_reg(15, 0x8000);
   arm->CallDebug = 1;
 
   rsp_init();
