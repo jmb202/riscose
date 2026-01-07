@@ -22,8 +22,7 @@
 #include "armsupp.h"
 
 void swiname(ARMword w, char *c, size_t s) { }
-#include "def.h"
-#include "instr.h"
+#include "disarm.h"
 #include "mem.h"
 
 static ARMword GetDPRegRHS (ARMul_State * state, ARMword instr);
