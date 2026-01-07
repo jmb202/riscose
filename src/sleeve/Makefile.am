@@ -1,6 +1,6 @@
 noinst_LIBRARIES = libsleeve.a
 
-libsleeve_a_SOURCES = arm.c arm.h armsleeve.c bdt.c dis.c dis.h dis.h \
+libsleeve_a_SOURCES = arm.c arm.h armsleeve.c bdt.c disarm.c disarm.h \
     mm.c mm.h sleeve.c sleeve.h stub.h
 
 noinst_PROGRAMS = genbdt

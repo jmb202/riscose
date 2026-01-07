@@ -14,7 +14,7 @@
 #include <mLib/exc.h>
 #include "arm.h"
 #include "mm.h"
-#include "dis.h"
+#include "disarm.h"
 
 /* --- Prototypes --- */
 

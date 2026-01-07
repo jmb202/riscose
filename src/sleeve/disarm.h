@@ -1,21 +1,35 @@
-/* dis.h
+/* disarm -- a simple disassembler for ARM instructions
+ * (c) 2000 Gareth McCaughan
  *
- * Disassembling individual instructions
+ * This file may be distributed and used freely provided:
+ * 1. You do not distribute any version that lacks this
+ *    copyright notice (exactly as it appears here, extending
+ *    from the start to the end of the C-language comment
+ *    containing these words)); and,
+ * 2. If you distribute any modified version, its source
+ *    contains a clear description of the ways in which
+ *    it differs from the original version, and a clear
+ *    indication that the changes are not mine.
+ * There is no restriction on your permission to use and
+ * distribute object code or executable code derived from
+ * this.
  *
- * (c) 1998 Gareth McCaughan
+ * The original version of this file (or perhaps a later
+ * version by the original author) may or may not be
+ * available at http://web.ukonline.co.uk/g.mccaughan/g/software.html .
+ *
+ * Share and enjoy!    -- g
  */
 
-/* This is in use until I can be arsed to write my own.              -- cmr */
-
-/* def.h : basic types and macros
+/* changes for riscose:
  *
- * This file is part of ObjDism.
- * (c) 1998 Gareth McCaughan.
- * See the file LICENCE for distribution conditions.
+ * 0. add this changelog
+ * 1. extract this header from disarm.c
+ * 2. declare instr_disassemble as extern
  */
 
-#include <stdio.h>
-#include <stdlib.h>
+#ifndef DISARM_H_
+#define DISARM_H_
 
 typedef unsigned long word;
 typedef unsigned long address;
@@ -26,34 +40,8 @@ typedef unsigned long addrdiff;
 #define defstruct(name) struct name
 #define defequiv(new,old) typedef struct old s##new, * p##new
 
-declstruct(AOFfile);
-declstruct(Area);
-declstruct(Chunk);
-declstruct(ChunkFile);
-declstruct(Feature);
-declstruct(SWIref);
 declstruct(DisOptions);
 declstruct(Instruction);
-
-/* It's helpful to use suitable names for specific kinds of
- * feature. Unfortunately C's losing type-checking loses too
- * badly to make this *really* helpful.
- */
-defequiv(FuncName,   Feature);
-defequiv(LabelDef,   Feature);
-defequiv(LabelRef,   Feature);
-defequiv(Symbol,     Feature);
-defequiv(Relocation, Feature);
-
-#define _NEED_def_h
-/* instr.h : macros etc for disassembling individual instructions
- *
- * This file is part of ObjDism.
- * (c) 1998 Gareth McCaughan.
- * See the file LICENCE for distribution conditions.
- */
-
-_NEED_def_h
 
 typedef enum {
   target_None,		/* instruction doesn't refer to an address */
@@ -82,6 +70,7 @@ defstruct(Instruction) {
 #define disopt_SWInames		1	/* use names, not &nnnn */
 #define disopt_CommaSpace	2	/* put spaces after commas */
 #define disopt_FIXS		4	/* bogus FIX syntax for ObjAsm */
+#define disopt_ReverseBytes	8	/* byte-reverse words first */
 
 defstruct(DisOptions) {
   word flags;
@@ -90,4 +79,4 @@ defstruct(DisOptions) {
 
 extern pInstruction instr_disassemble(word, address, pDisOptions);
 
-#define _NEED_instr_h
+#endif
