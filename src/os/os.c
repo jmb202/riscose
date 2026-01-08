@@ -105,13 +105,21 @@ static os_error* swih_os_control(WORD n)
   return 0;
 }
 
+static os_error* os_enter_os(WORD n)
+{
+  WORD pc = arm_get_r15_all();
+  arm_enter_svc();
+  arm_set_reg(14, pc - 4); // XXX: not clear this is sane
+  return 0;
+}
 
 void os_swi_register_extra(void)
 {
   swi_register(0x1, "OS_WriteS", os_write_s);
+  swi_register(0xf, "OS_Control", swih_os_control);
+  swi_register(0x16, "OS_EnterOS", os_enter_os);
   swi_register(0x6f, "OS_CallASWI", os_call_a_swi);
   swi_register(0x71, "OS_CallASWIR12", os_call_a_swi_r12);
-  swi_register(0xf, "OS_Control", swih_os_control);
 }
 
 /* ------------------------------------------------------------------------
