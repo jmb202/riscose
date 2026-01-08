@@ -19,6 +19,9 @@ WORD	arm_get_reg(WORD num);
 WORD	arm_get_r15_all(void);
 void	arm_set_reg(WORD num, WORD val);
 
+void	arm_enter_svc(void);
+void	arm_leave_svc(void);
+
 void    arm_set_debug(int);
 
 /* Some macros for convenience */

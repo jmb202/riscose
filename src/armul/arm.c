@@ -143,6 +143,23 @@ arm_return(void)
   arm->Emulate = STOP;
 }
 
+void
+arm_enter_svc(void)
+{
+  ARMul_State *state = arm;
+
+  arm->Spsr[SVCBANK] = CPSR;
+  arm_set_reg(15, arm_get_r15_all() | 0x3);
+  assert(arm_get_reg(13) > MMAP_SVCSTACK_BASE);
+}
+
+void
+arm_leave_svc(void)
+{
+  arm_set_reg(15, arm_get_r15_all() & ~3);
+  assert(arm_get_reg(13) > MMAP_USRSTACK_BASE);
+}
+
 WORD
 arm_get_reg(WORD num)
 {
