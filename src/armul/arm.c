@@ -85,7 +85,7 @@ arm_init(void)
       arm->CDP[dummyInstr] = (ARMul_CDPs *)arm_unsupported_instruction;
   }
   arm->MRC[15] = (ARMul_MRCs *)cp15_mrc;
-  ARMul_SelectProcessor(arm, ARM2);
+  ARMul_SelectProcessor(arm, ARM3);
   ARMul_Reset(arm);
 
   /* Expect to be in SVC mode */
