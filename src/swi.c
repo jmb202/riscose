@@ -169,9 +169,10 @@ void swi_trap(WORD num)
 
             arm_set_reg(11, num & 0x3f);
             arm_set_reg(12, module_private_word_ptr(i));
-            arm_set_reg(15, old_r15 | 0x3);
-            assert(arm_get_reg(13) > MMAP_SVCSTACK_BASE);
+
+            arm_enter_svc();
             arm_run_routine(MEM_READ_WORD(base+0x20)+base);
+            arm_leave_svc();
 
             if (ARM_V_SET) {
               e = (os_error*) MEM_TOHOST(arm_get_reg(0));
