@@ -52,7 +52,22 @@ static void arm_unsupported_instruction(ARMul_State *state,unsigned type,ARMword
         instr, p->text, arm_get_reg(15), CPSR);
     abort();
 }
-  
+
+static void cp15_mrc(ARMul_State *state, unsigned type, ARMword instr, ARMword value)
+{
+  ARMword op = (instr & 0x00e00000) >> 21;
+  ARMword crn = (instr & 0x000f0000) >> 16;
+  ARMword rd = (instr & 0x0000f000) >> 12;
+  ARMword info = (instr & 0x000000e0) >> 5;
+  ARMword crm = instr & 0xf;
+
+  if (op != 0 || crn != 0 || crm != 0 || info != 0)
+    return arm_unsupported_instruction(state, type, instr, value);
+
+  /* Claim to be an ARM3 */
+  arm_set_reg(rd, 0x41560300);
+}
+
 static WORD arm_run_depth;
 void
 arm_init(void)
@@ -62,13 +77,14 @@ arm_init(void)
   ARMul_EmulateInit();
 
   arm = ARMul_NewState();
-    for (dummyInstr = 0; dummyInstr < 16; dummyInstr++) {
-        arm->LDC[dummyInstr] = (ARMul_LDCs *)arm_unsupported_instruction;
-        arm->STC[dummyInstr] = (ARMul_STCs *)arm_unsupported_instruction;
-        arm->MRC[dummyInstr] = (ARMul_MRCs *)arm_unsupported_instruction;
-        arm->MCR[dummyInstr] = (ARMul_MCRs *)arm_unsupported_instruction;
-        arm->CDP[dummyInstr] = (ARMul_CDPs *)arm_unsupported_instruction;
-    }
+  for (dummyInstr = 0; dummyInstr < 16; dummyInstr++) {
+      arm->LDC[dummyInstr] = (ARMul_LDCs *)arm_unsupported_instruction;
+      arm->STC[dummyInstr] = (ARMul_STCs *)arm_unsupported_instruction;
+      arm->MRC[dummyInstr] = (ARMul_MRCs *)arm_unsupported_instruction;
+      arm->MCR[dummyInstr] = (ARMul_MCRs *)arm_unsupported_instruction;
+      arm->CDP[dummyInstr] = (ARMul_CDPs *)arm_unsupported_instruction;
+  }
+  arm->MRC[15] = (ARMul_MRCs *)cp15_mrc;
   ARMul_SelectProcessor(arm, ARM2);
   ARMul_Reset(arm);
 
