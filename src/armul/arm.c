@@ -16,6 +16,7 @@
 #include "arminit.h"
 #include "armsupp.h"
 #include "armemu.h"
+#include "disarm.h"
 #include "mem.h"
 #include "map.h"
 #include "swi.h"
@@ -41,7 +42,14 @@ dumpregs(void)
 #include <stdio.h>
 static void arm_unsupported_instruction(ARMul_State *state,unsigned type,ARMword instr,ARMword value)
 {
-    fprintf(stderr, "Unsupported ARM instruction %08x found, aborting\n", instr);
+    char *regs[16] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7",
+                      "r8", "r9", "sl", "fp", "ip", "sp", "lr", "pc"};
+    sDisOptions opts = {disopt_CommaSpace, regs};
+    pInstruction p = instr_disassemble(instr, arm_get_reg(15), &opts);
+
+    fprintf(stderr,
+        "Unsupported ARM instruction %08x (%s) found at %08x (%08x), aborting\n",
+        instr, p->text, arm_get_reg(15), CPSR);
     abort();
 }
   
