@@ -1949,10 +1949,19 @@ os_error *xos_read_dynamic_area (os_dynamic_area_no area,
       int *size,
       int *size_limit)
 {
-  *area_start = 0;
-  *size       = 0;
-  if (area & 0x80) {
-      *size_limit = 0;
+  switch (area) {
+  case os_DYNAMIC_AREA_APPLICATION_SPACE:
+    *area_start = (byte *) MEM_TOHOST(MMAP_APP_BASE);
+    *size = mem_get_wimpslot();
+    *size_limit = MMAP_APP_SIZE;
+    break;
+  default:
+    *area_start = 0;
+    *size       = 0;
+    if (area & 0x80) {
+        *size_limit = 0;
+    }
+    break;
   }
 
   return 0;
