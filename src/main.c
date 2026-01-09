@@ -83,7 +83,7 @@ MONTY_DEBUG_HELP
 RISCOSE_DEBUG_HELP
 "    -m, --module      binary is a module.\n"
 "    -u, --utility     binary is a utility.\n"
-"    -w, --wimpslot=K  allocates K kilobytes for execution.\n"
+"    -w, --wimpslot=B  allocates B bytes for execution.\n"
 "    -r, --rmload=s    load this relocatable module.\n"
 "    -g, --gdb         provide gdb remote target on port 53415.\n"
 "binary is the risc os executable to run.  args are its arguments.\n",
@@ -124,7 +124,7 @@ RISCOSE_DEBUG_HELP
         case 'w':
             /* FIXME: needs better error checking. */
             /* FIXME: perhaps units should be allowed. */
-            wimpslot = atoi(optarg);
+            wimpslot = atoi(optarg) & ~3; /* Ensure multiple of 4 */
             break;
         case 'r':
             to_rmload = reallocarray(to_rmload, rmload_count+1, sizeof(char*));
