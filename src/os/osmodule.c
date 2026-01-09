@@ -8,6 +8,7 @@
 #include <stdio.h>
 
 #include "monty/monty.h"
+#include "mem.h"
 #include "types.h"
 #include "rom/rom.h"
 #include "osmodule.h"
@@ -68,14 +69,21 @@ os_error *xosmodule_info(int *max,
 os_error *xosmodule_alloc(int size,
     void **blk)
 {
-    return ERR_NO_SUCH_SWI();
+    void *p = mem_rma_alloc(size);
+    if (p == NULL)
+        return ERR_MODULE_MH_NO_ROOM();
+
+    *blk = p;
+
+    return NULL;
 }
 
 /* ---- xosmodule_free ---------------------------------------------- */
 
 os_error *xosmodule_free(void *blk)
 {
-    return ERR_NO_SUCH_SWI();
+    mem_free(blk);
+    return NULL;
 }
 
 /* ---- xosmodule_tidy ---------------------------------------------- */
