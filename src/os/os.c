@@ -2008,7 +2008,19 @@ os_error *xos_change_redirectionw (os_fw input,
       os_fw *old_input,
       os_fw *old_output)
 {
-  return ERR_NO_SUCH_SWI();
+  /* XXX: support redirecting OS_CLI */
+
+  if (input == (os_fw)-1 || input == 0)
+    *old_input = 0;
+  else
+    return ERR_NO_SUCH_SWI();
+
+  if (output == (os_fw)-1 || output == 0)
+    *old_output = 0;
+  else
+    return ERR_NO_SUCH_SWI();
+
+  return NULL;
 }
 
 /* ------------------------------------------------------------------------
