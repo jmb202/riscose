@@ -17,6 +17,46 @@ CONST
    Error_SharedUnixLibraryNotEnoughMem = .Bits: &81a43e,
    Error_SharedUnixLibraryNoCallASWI = .Bits: &81a43f;
 
+// XXX: The generator stupidly uses unsized types so a 64bit host
+// will have unexpected field sizes. Work around it by claiming everything is an int
+TYPE
+   SharedUnixLibrary_Process =
+      .Struct
+      (
+         .Int: reserved1,
+         .Int: reserved2,
+         .Int: sul_malloc, //.Ref .Asm: sul_malloc,
+         .Int: sul_free, //.Ref .Asm: sul_free,
+         .Int: sul_exit, //.Ref .Asm: sul_exit,
+         .Int: pid,
+         .Int: ppid,
+         .Int: pgrp,
+         .Int: uid,
+         .Int: euid,
+         .Int: gid,
+         .Int: egid,
+         .Int: ppri,
+         .Int: gpri,
+         .Int: upri,
+         .Int: umask,
+         .Int: file_descriptors, //.Ref .Asm: file_descriptors,
+         .Int: maxfd,
+         .Int: fdsize,
+         .Int: fdhandlesize,
+         .Int: tty_type,
+         .Int: console, //.Ref .Asm: console,  // Pointer to struct tty
+         .Int: rs432, //.Ref .Asm: rs432,    // ditto
+         .Int: environ, //.Ref .Ref .String: environ,
+         .Int: status,
+         .Int: children, //.Ref SharedUnixLibrary_Process: children,
+         .Int: next_child, //.Ref SharedUnixLibrary_Process: next_child,
+         .Int: sul_fork, //.Ref .Asm: sul_fork,
+         .Int: environ_size,
+         .Int: sul_exec, //.Ref .Asm: sul_exec,
+         .Int: sul_wimpslot, //.Ref .Asm: sul_wimpslot,
+         .Int: stack_handle //.Ref .Asm: stack_handle
+      );
+
 SWI SharedUnixLibrary_RegisterUpCall = ( NUMBER &55c80 );
 SWI SharedUnixLibrary_DeRegisterUpCall = ( NUMBER &55c81 );
 SWI SharedUnixLibrary_SetValue = ( NUMBER &55c82 );
@@ -27,7 +67,7 @@ SWI SharedUnixLibrary_Initialise = ( NUMBER &55c84,
       R0 = .Int: version_required
    ),
    EXIT (
-      R0 = .Int: proc,
+      R0 -> SharedUnixLibrary_Process: proc,
       R1 -> .Asm: upcall_handler_addr,
       R2 = .Ref .Data: upcall_handler_r12
    )
