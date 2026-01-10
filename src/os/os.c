@@ -42,14 +42,12 @@ static const int Sys$RCLimit = 256;
 
 os_error* os_call_a_swi(WORD n)
 {
-  swi_trap(ARM_R10);
-  return 0;
+  return swi_trap(ARM_R10);
 }
 
 os_error* os_call_a_swi_r12(WORD n)
 {
-  swi_trap(ARM_R12);
-  return 0;
+  return swi_trap(ARM_R12);
 }
 
 os_error* os_write_s(WORD n)

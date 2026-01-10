@@ -98,7 +98,7 @@ void swi_register(WORD number, char *name, swi_handler handler)
     return;
 }
 
-void swi_trap(WORD num)
+os_error* swi_trap(WORD num)
 {
     os_error *e = NULL;
     swi_routine *r = NULL;
@@ -119,14 +119,14 @@ void swi_trap(WORD num)
     if (num >= 0x100 && num <= 0x1ff)
     {
       vdu(num & 0xff);
-      return;
+      return NULL;
     }
     
     if (SWI_OS(num) == SWI_OS_TRAP) {
 #ifndef NATIVE
         if (num == SWI_MAGIC_RETURN) {
             arm_return();
-            return;
+            return NULL;
         }
 #endif
 
@@ -140,7 +140,7 @@ void swi_trap(WORD num)
         debug("return R0 = %lx\n", ARM_R0);
 #endif
 
-        return;
+        return NULL;
     }
 
     /* Is SWI handled by a real module? */
@@ -201,7 +201,9 @@ void swi_trap(WORD num)
         else {
             e = r->handler(num);
 
-            if (e && e->errnum == 0x1e6 && SWI_NUM(num) != 0x39) {
+            /* OS_SWINumberFromString/OS_CallASWI/OS_CallASWIR12 are implemented */
+            if (e && e->errnum == 0x1e6 && SWI_NUM(num) != 0x39 &&
+                SWI_NUM(num) != 0x6f && SWI_NUM(num) != 0x71) {
                 swi_number_to_name(SWI_NUM(num), buf);
                 printf("Unhandled SWI %s called at %08x\n", buf, (unsigned) ARM_R15-8);
             }
@@ -234,7 +236,7 @@ void swi_trap(WORD num)
         }
     }
 
-    return;
+    return e;
 }
 
 /* ------------------------------------------------------------------ */
