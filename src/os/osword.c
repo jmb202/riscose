@@ -169,6 +169,19 @@ os_error *xosword_read_cursor_position (osword_cursor_position_block *position)
 
 os_error *xoswordreadclock_local_string (oswordreadclock_local_string_block *string)
 {
+  // XXX: need a better answer for this kind of thing
+  switch (string->op) {
+  case oswordreadclock_OP_LOCAL_STRING:
+    break;
+  case oswordreadclock_OP_LOCAL_BCD:
+    return xoswordreadclock_local_bcd((oswordreadclock_local_bcd_block *)string);
+  case oswordreadclock_OP_CONVERT_BCD_TO_STRING:
+    return xoswordreadclock_convert_bcd_to_string((oswordreadclock_convert_bcd_to_string_block *)string);
+  case oswordreadclock_OP_UTC:
+    return xoswordreadclock_utc((oswordreadclock_utc_block *)string);
+  default:
+    return ERR_NO_SUCH_SWI();
+  }
   return ERR_NO_SUCH_SWI();
 }
 
@@ -218,7 +231,14 @@ os_error *xoswordreadclock_convert_bcd_to_string (oswordreadclock_convert_bcd_to
 
 os_error *xoswordreadclock_utc (oswordreadclock_utc_block *utc)
 {
-  return ERR_NO_SUCH_SWI();
+  osword_timer_block t;
+  os_error *err;
+
+  err = xosword_read_system_clock (&t);
+  if (err == NULL)
+    memcpy(utc->utc, t.b, sizeof(utc->utc));
+
+  return err;
 }
 
 /* ------------------------------------------------------------------------
