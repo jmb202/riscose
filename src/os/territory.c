@@ -272,7 +272,7 @@ os_error *xterritory_character_property_table(territory_t territory,
                     assert(1==0);
                     break;
             }
-            map[property]->p[c] = out ? 0xff : 0x00;
+            map[property]->p[c>>5] |= out ? (1<<(c&0x1f)) : 0;
         }
     }
     *table = map[property];

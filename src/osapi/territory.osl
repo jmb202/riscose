@@ -85,7 +85,7 @@ TYPE
       );
 
 TYPE
-   Territory_PropertyTable = .Struct ([256] .Bool: p);
+   Territory_PropertyTable = .Struct ([8] .Bits: p);
 
 TYPE
    Territory_Calendar =
