@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <curses.h>
 #include <string.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
 #include <assert.h>
 
 #include "vdu.h"
@@ -25,8 +27,20 @@ int fgcol = 1, bgcol = 0;
 int
 vdu_getch(void)
 {
-  int c = getch();
-  return (c == ERR) ? -1 : c;
+  if (vdu_mode == -1) {
+    /* Text mode */
+    int n;
+    if (ioctl(STDIN_FILENO, FIONREAD, &n) == -1)
+        return -1;
+    if (n == 0)
+        return -1;
+    n = getchar();
+    return (n == EOF) ? -1 : n;
+  } else {
+    /* Graphics mode */
+    int c = getch();
+    return (c == ERR) ? -1 : c;
+  }
 }
 
 static void

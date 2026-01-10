@@ -20,6 +20,8 @@
 #include <string.h>
 #include <assert.h>
 #include <sys/stat.h>
+#include <termios.h>
+#include <unistd.h>
 
 #include "config.h"
 #include "monty/monty.h"
@@ -35,6 +37,43 @@
 
 static void utility_run(char *file, mem_private *priv);
 static int string_to_int(char *s, int *i);
+
+static struct termios orig_stdin_state;
+
+static void
+restore_console_state(void)
+{
+  if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_stdin_state) != 0) {
+      error("tcsetattr failed\n");
+  }
+}
+
+static void
+console_init(void)
+{
+  if (isatty(STDIN_FILENO)) {
+    /* stdin is a tty: engage raw mode */
+    struct termios state;
+    if (tcgetattr(STDIN_FILENO, &orig_stdin_state) != 0) {
+        error("tcgetattr failed\n");
+    }
+    memcpy(&state, &orig_stdin_state, sizeof(state));
+    state.c_iflag &= ICRNL;
+    state.c_lflag &= ~(ECHO | ICANON | IEXTEN);
+    if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &state) != 0) {
+        error("tcsetattr failed\n");
+    }
+
+    atexit(restore_console_state);
+  }
+
+  if (isatty(STDOUT_FILENO)) {
+    /* stdout is a tty: disable line buffering */
+    if (setvbuf(stdout, NULL, _IONBF, 0) != 0) {
+      error("setvbuf failed\n");
+    }
+  }
+}
 
 int
 main(int argc, char **argv)
@@ -166,6 +205,8 @@ RISCOSE_DEBUG_HELP
 
     mem_task_switch(mem_task_new(wimpslot,
         module || utility ? NULL : file, NULL));
+
+  console_init();
 
   /* Set up unprocessed + processed command line storage thingies */
     
