@@ -201,8 +201,11 @@ os_error* swi_trap(WORD num)
         else {
             e = r->handler(num);
 
-            /* OS_SWINumberFromString/OS_CallASWI/OS_CallASWIR12 are implemented */
-            if (e && e->errnum == 0x1e6 && SWI_NUM(num) != 0x39 &&
+            /* OS_ReadVarVal/OS_SWINumberFromString/OS_CallASWI/OS_CallASWIR12
+	     * can return error code &1e6 in normal operation (and they are
+	     * implemented, so there's use whinging). */
+            if (e && e->errnum == 0x1e6 &&
+                SWI_NUM(num) != 0x23 && SWI_NUM(num) != 0x39 &&
                 SWI_NUM(num) != 0x6f && SWI_NUM(num) != 0x71) {
                 swi_number_to_name(SWI_NUM(num), buf);
                 printf("Unhandled SWI %s called at %08x\n", buf, (unsigned) ARM_R15-8);

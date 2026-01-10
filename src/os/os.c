@@ -150,7 +150,11 @@ os_error *xos_read_var_val_size (char *var,
   *used = 0;
   *context_out = 0;
   *var_type_out = 0;
-  return 0;
+  /* The real thing returns code &1e6 with a suitable error message
+   * when the variable cannot be found.  We don't have an error defined,
+   * but no such swi also uses &1e6 (and nothing should be relying on
+   * the error message content) */
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
@@ -834,7 +838,11 @@ os_error *xos_read_var_val (char *var,
   *used = 0;
   *context_out = 0;
   *var_type_out = 0;
-  return 0;
+  /* The real thing returns code &1e6 with a suitable error message
+   * when the variable cannot be found.  We don't have an error defined,
+   * but no such swi also uses &1e6 (and nothing should be relying on
+   * the error message content) */
+  return ERR_NO_SUCH_SWI();
 }
 
 /* ------------------------------------------------------------------------
