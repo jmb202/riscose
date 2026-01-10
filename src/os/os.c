@@ -11,6 +11,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 #include <monty/monty.h>
 #include <readline/readline.h>
@@ -1446,7 +1447,14 @@ os_error *xosclaimscreenmemory_free (void)
 
 os_error *xos_read_monotonic_time (os_t *t)
 {
-  return ERR_NO_SUCH_SWI();
+  struct timespec ts;
+
+  if (clock_gettime(CLOCK_MONOTONIC_RAW, &ts) == -1)
+    return ERR_BAD_TIME();
+
+  *t = ts.tv_sec * 100 + ts.tv_nsec / 10000000;
+
+  return NULL;
 }
 
 /* ------------------------------------------------------------------------
