@@ -51,7 +51,12 @@ os_error *xddeutils_set_cl(char *tail)
 
 os_error *xddeutils_get_cl_size(int *size)
 {
-    *size = strlen((char*) mem_f_tohost(MMAP_USRSTACK_BASE));
+    mem_private *priv = mem_get_private();
+    char *space = strchr((const char *)priv->cli, ' ');
+    if (space == NULL)
+      *size = 0;
+    else
+      *size = strlen(space + 1);
 
     return NULL;
 }
@@ -60,7 +65,12 @@ os_error *xddeutils_get_cl_size(int *size)
 
 os_error *xddeutils_get_cl(char *tail)
 {
-    *tail = mem_f_tohost(MMAP_USRSTACK_BASE);
+    mem_private *priv = mem_get_private();
+    char *space = strchr((const char *)priv->cli, ' ');
+    if (space == NULL)
+      *tail = '\0';
+    else
+      strcpy(tail, space + 1);
 
     return NULL;
 }
