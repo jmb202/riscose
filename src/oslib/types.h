@@ -21,12 +21,15 @@
    Foundation, Inc, 675 Mass Ave, Cambridge, MA 02139, U S A.
 */
 
+#include <inttypes.h>
+
 /********************
  * Type definitions *
  ********************/
-typedef unsigned int                            bits;
-typedef int                                     osbool;
-typedef unsigned char                           byte;
+typedef uint32_t                                bits;
+typedef uint32_t                                bytes;
+typedef int32_t                                 osbool;
+typedef uint8_t                                 byte;
 
 /* for backward compatibility with non C++ and pre-C99 code
 ** we can typedef |bool| as |osbool|. Anyone who wants to provide

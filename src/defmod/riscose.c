@@ -123,7 +123,7 @@ void print_title_comment(char *s)
 #define sINDENT 4 * (nest + 1), ""
 
 int Print_Decl(def_t t, char *tag, char *v, int macro,
-    int nest)
+    int nest, int field)
 {
     FILE *file;
     char *spcv;
@@ -143,10 +143,10 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
 
     switch (t->tag) {
     case def_TYPE_INT:
-        fprintf(file, "int%s", spcv);
+        fprintf(file, "int32_t%s", spcv);
         break;
     case def_TYPE_SHORT:
-        fprintf(file, "short%s", spcv);
+        fprintf(file, "int16_t%s", spcv);
         break;
     case def_TYPE_BYTE:
         fprintf(file, "byte%s", spcv);
@@ -167,8 +167,17 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
         {
             char v1[def_ID_LIMIT + 1];
 
+            if (field) {
+                /* We can't use native pointers here as they may
+                 * have a different size to that of RISC OS */
+                fprintf(file, "WORD%s ", spcv);
+                fprintf(file, "/*");
+            }
             sprintf(v1, "*%s", v ? v : "");
-            Print_Decl(t->data.ref, NULL, v1, macro, nest + 1);
+            Print_Decl(t->data.ref, NULL, v1, macro, nest + 1, FALSE);
+            if (field) {
+                fprintf(file, "*/");
+            }
         }
         break;
     case def_TYPE_STRING:
@@ -211,10 +220,10 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
                         t->data.list.members[i]->name, size);
 
                     Print_Decl(t->data.list.members[i], NULL, v1,
-                        macro, nest + 1);
+                        macro, nest + 1, TRUE);
                 } else {
                     Print_Decl(t->data.list.members[i], NULL,
-                        t->data.list.members[i]->name, macro, nest + 1);
+                        t->data.list.members[i]->name, macro, nest + 1, TRUE);
                 }
 
                 fprintf(file, ";%s\n%*s", lineend, sINDENT);
@@ -251,7 +260,7 @@ int Print_Decl(def_t t, char *tag, char *v, int macro,
             }
 
             Print_Decl(t->data.row.base, NULL, v1, macro,
-                nest + 1);
+                nest + 1, TRUE);
         }
         break;
 

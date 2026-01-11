@@ -96,7 +96,7 @@ void riscose_template_output(char *title, char *author,
 
                 print_sep(FALSE);
                 t.tag = def_TYPE_BITS;
-                Print_Decl(&t, NULL, "*psr", FALSE, 0);
+                Print_Decl(&t, NULL, "*psr", FALSE, 0, FALSE);
             }
         } else {
             for (i = 0; i < 10; i++) {
@@ -110,7 +110,7 @@ void riscose_template_output(char *title, char *author,
 
                         mem = def->data.list.members[cpt];
                         print_sep(FALSE);
-                        Print_Decl(mem, NULL, mem->name, FALSE, 0);
+                        Print_Decl(mem, NULL, mem->name, FALSE, 0, FALSE);
                     }
                     break;
                 }
@@ -150,7 +150,7 @@ static void print_params(bits b, bits rb, struct def_t **puts,
             print_sep(FALSE);
             sprintf(arg_name, "%s%s%s", arg_prefix,
                 ((rb & 1 << i) ? "*" : ""), puts[i]->name);
-            Print_Decl(puts[i], NULL, arg_name, FALSE, 0);
+            Print_Decl(puts[i], NULL, arg_name, FALSE, 0, FALSE);
         }
     }
 

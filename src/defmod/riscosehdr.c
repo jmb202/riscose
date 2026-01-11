@@ -108,6 +108,9 @@ void riscose_header_output
          "#endif\n\n")) < 0)
       goto finish;
 
+   if ((rc = fprintf(file, "#include \"riscostypes.h\"\n\n")) < 0)
+      goto finish;
+
    /*Emit the NEEDS declarations.*/
    context = 0;
     while (lookup_enumerate(needses, &needs, NULL, &context)) {
@@ -320,7 +323,8 @@ void riscose_header_output
                   if ((rc = fprintf (file, " \\\n   ")) < 0)
                      goto finish;
                   if ((rc = Print_Decl (t->data AS list.members [i],
-                        NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
+                        NULL, t->data AS list.members [i]->name, TRUE, 0,
+                        TRUE)) < 0)
                      goto finish;
                   if ((rc = fprintf (file, ";")) < 0)
                      goto finish;
@@ -344,14 +348,15 @@ void riscose_header_output
                      c_name, macro_name)) < 0)
                   goto finish;
                if ((rc = Print_Decl (t->data AS list.members [i],
-                     NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
+                     NULL, t->data AS list.members [i]->name, TRUE, 0,
+                     TRUE)) < 0)
                   goto finish;
                if ((rc = fprintf (file, " [UNKNOWN];\n   }")) < 0)
                   goto finish;
 
             } /* end variable-size structure definition */
             else
-               if ((rc = Print_Decl (t, c_name, NULL, FALSE, 0)) < 0)
+               if ((rc = Print_Decl (t, c_name, NULL, FALSE, 0, TRUE)) < 0)
                   goto finish;
             if ((rc = fprintf (file, ";\n\n")) < 0)
                goto finish;
@@ -380,7 +385,8 @@ void riscose_header_output
                         macro_name)) < 0)
                      goto finish;
                if ((rc = Print_Decl (t->data AS list.members [i],
-                     NULL, t->data AS list.members [i]->name, TRUE, 0)) < 0)
+                     NULL, t->data AS list.members [i]->name, TRUE, 0,
+                     TRUE)) < 0)
                   goto finish;
                if ((rc = fprintf (file, " [N]; \\\n      }")) < 0)
                   goto finish;
@@ -432,7 +438,7 @@ void riscose_header_output
             if ((rc = fprintf (file, "typedef ")) < 0)
                goto finish;
 
-            if ((rc = Print_Decl (t, NULL, c_name, FALSE, 0)) < 0)
+            if ((rc = Print_Decl (t, NULL, c_name, FALSE, 0, TRUE)) < 0)
                goto finish;
 
             if ((rc = fprintf (file, ";\n")) < 0)
@@ -472,7 +478,7 @@ void riscose_header_output
          break;
 
          case def_TYPE_SHORT:
-            if ((rc = fprintf (file, "((short) %d)", c->value)) < 0)
+            if ((rc = fprintf (file, "((int16_t) %d)", c->value)) < 0)
                goto finish;
          break;
 
@@ -515,7 +521,7 @@ void riscose_header_output
                goto finish;
 
             if ((rc = Print_Decl (c->type, NULL, NULL, FALSE,
-                  0)) < 0)
+                  0, FALSE)) < 0)
                goto finish;
 
             if ((rc = fprintf (file, ") 0x%Xu)", c->value)) < 0)
@@ -837,7 +843,7 @@ void riscose_header_output
                   }
 
                   if ((rc = Print_Decl (s->inputs [i], NULL,
-                        arg_name, FALSE, 0)) < 0)
+                        arg_name, FALSE, 0, FALSE)) < 0)
                      goto finish;
                }
 
@@ -868,7 +874,7 @@ void riscose_header_output
                   }
 
                   if ((rc = Print_Decl (s->outputs [i], NULL,
-                        arg_name, FALSE, 0)) < 0)
+                        arg_name, FALSE, 0, FALSE)) < 0)
                      goto finish;
                }
 
@@ -886,7 +892,7 @@ void riscose_header_output
 
                t.tag = def_TYPE_BITS;
                if ((rc = Print_Decl (&t, NULL,
-                     "*psr", FALSE, 0)) < 0)
+                     "*psr", FALSE, 0, FALSE)) < 0)
                   goto finish;
             }
          }
@@ -911,7 +917,7 @@ void riscose_header_output
                      if ((rc = Print_Decl (
                            s->inputs [i]->data AS list.members [cpt],
                            NULL, s->inputs [i]->data AS list.members
-                           [cpt]->name, FALSE, 0)) < 0)
+                           [cpt]->name, FALSE, 0, FALSE)) < 0)
                         goto finish;
                   }
 

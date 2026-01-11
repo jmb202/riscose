@@ -14,6 +14,6 @@
 
 typedef int32_t  WORD_signed;
 typedef uint32_t WORD;
-typedef unsigned char BYTE;
+typedef uint8_t  BYTE;
 
 #endif

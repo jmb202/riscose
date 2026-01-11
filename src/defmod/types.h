@@ -21,9 +21,11 @@
    Foundation, Inc, 675 Mass Ave, Cambridge, MA 02139, U S A.
 */
 
-typedef unsigned int bits, bytes;
-typedef int osbool;
-typedef unsigned char byte;
+#include <inttypes.h>
+
+typedef uint32_t bits, bytes;
+typedef int32_t osbool;
+typedef uint8_t byte;
 
 #define AS .
    /*may be used for components of a union*/

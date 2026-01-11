@@ -219,7 +219,7 @@ void riscose_osapi_output
 
              /* Cast */
              fprintf(file, "(");
-             Print_Decl(s->inputs[i], "", "", FALSE, 0);
+             Print_Decl(s->inputs[i], "", "", FALSE, 0, FALSE);
              fprintf(file, (s->ri & (1 << i)) ? "*) " : ") ");
 
              /* Convert to a host address if this is a pointer */
@@ -249,7 +249,7 @@ void riscose_osapi_output
 
              /* Cast */
              fprintf(file, "(");
-             Print_Decl(s->outputs[i], "", "", FALSE, 0);
+             Print_Decl(s->outputs[i], "", "", FALSE, 0, FALSE);
              fprintf(file, (s->ro & (1 << i)) ? "**) " : "*) ");
 
              fprintf(file, "&r%d", i);

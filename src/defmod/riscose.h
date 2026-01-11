@@ -33,7 +33,7 @@ void print_start_of_file_comment(int warn);
 
 void print_title_comment(char *s);
 
-int Print_Decl(def_t t, char *tag, char *v, osbool macro, int nest);
+int Print_Decl(def_t t, char *tag, char *v, osbool macro, int nest, int field);
 
 /* Make producing indented output easier and more terse. */
 EXTERN int dented;
