@@ -64,8 +64,8 @@ static void cp15_mrc(ARMul_State *state, unsigned type, ARMword instr, ARMword v
   if (op != 0 || crn != 0 || crm != 0 || info != 0)
     return arm_unsupported_instruction(state, type, instr, value);
 
-  /* Claim to be an ARM3 */
-  arm_set_reg(rd, 0x41560300);
+  /* Claim to be an ARM720 */
+  arm_set_reg(rd, 0x41807200);
 }
 
 static WORD arm_run_depth;
