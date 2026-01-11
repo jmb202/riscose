@@ -15,6 +15,8 @@
     along with this program; if not, write to the Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
+extern ARMword isize;
+
 /***************************************************************************\
 *                           Condition code values                           *
 \***************************************************************************/
@@ -63,6 +65,15 @@
 #define POS(i) ( (~(i)) >> 31 )
 #define NEG(i) ( (i) >> 31 )
 
+/* Thumb support */
+/* ??? This bit is actually in the low order bit of the PC in the hardware.
+   It isn't clear if the simulator needs to model that or not.  */
+#define TBIT (1L << 5)
+#define TFLAG state->TFlag
+#define SETT state->TFlag = 1
+#define CLEART state->TFlag = 0
+#define ASSIGNT(res) state->TFlag = res
+
 #define NFLAG state->NFlag
 #define SETN state->NFlag = 1
 #define CLEARN state->NFlag = 0
@@ -91,10 +102,22 @@
 
 #define CCBITS (0xf0000000L)
 #define INTBITS (0xc0L)
+
+#if defined MODE32
+#define PCBITS (0xffffffffL)
+#else
 #define PCBITS (0xfffffffcL)
+#endif
+
 #define MODEBITS (0x1fL)
 #define R15INTBITS (3L << 26)
+
+#if defined MODE32
+#define R15PCBITS (0x03ffffffL)
+#else
 #define R15PCBITS (0x03fffffcL)
+#endif
+
 #define R15PCMODEBITS (0x03ffffffL)
 #define R15MODEBITS (0x3L)
 
@@ -120,7 +143,7 @@
 #define ER15INT (IFFLAGS << 26)
 #define EMODE (state->Mode)
 
-#define CPSR (ECC | EINT | EMODE)
+#define CPSR (ECC | EINT | EMODE | (TFLAG << 5))
 #ifdef MODE32
 #define PATCHR15
 #else
@@ -185,11 +208,11 @@
 
 #define NORMALCYCLE state->NextInstr = 0
 #define BUSUSEDN state->NextInstr |= 1 /* the next fetch will be an N cycle */
-#define BUSUSEDINCPCS state->Reg[15] += 4 ; /* a standard PC inc and an S cycle */ \
+#define BUSUSEDINCPCS state->Reg[15] += isize ; /* a standard PC inc and an S cycle */ \
                       state->NextInstr = (state->NextInstr & 0xff) | 2
-#define BUSUSEDINCPCN state->Reg[15] += 4 ; /* a standard PC inc and an N cycle */ \
+#define BUSUSEDINCPCN state->Reg[15] += isize ; /* a standard PC inc and an N cycle */ \
                       state->NextInstr |= 3
-#define INCPC state->Reg[15] += 4 ; /* a standard PC inc */ \
+#define INCPC state->Reg[15] += isize ; /* a standard PC inc */ \
               state->NextInstr |= 2
 #define FLUSHPIPE state->NextInstr |= PRIMEPIPE
 
@@ -220,7 +243,7 @@
 #define DEST (state->Reg[DESTReg])
 
 #ifdef MODE32
-#define LHS (state->Reg[LHSReg])
+#define LHS ((LHSReg == 15) ? (state->Reg[15] & 0xFFFFFFFC): (state->Reg[LHSReg]))
 #else
 #define LHS ((LHSReg == 15) ? R15PC : (state->Reg[LHSReg]) )
 #endif
@@ -350,6 +373,18 @@ extern void ARMul_CDP(ARMul_State *state,ARMword instr) ;
 extern unsigned IntPending(ARMul_State *state) ;
 extern ARMword ARMul_Align(ARMul_State *state, ARMword address, ARMword data) ;
 #define EVENTLISTSIZE 1024L
+
+#ifdef MODET
+/* Thumb support: */
+
+typedef enum {
+  t_undefined,  /* undefined Thumb instruction */
+  t_decoded,    /* instruction decoded to ARM equivalent */
+  t_branch      /* Thumb branch (already processed) */
+} tdstate;
+
+extern tdstate ARMul_ThumbDecode(ARMul_State *state, ARMword pc, ARMword tinstr, ARMword *ainstr);
+#endif
 
 /***************************************************************************\
 *                      Macros to scrutinize instructions                    *

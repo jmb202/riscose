@@ -16,6 +16,7 @@
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA. */
 
 #include <stdio.h>
+#include <string.h>
 #include "armdefs.h"
 #include "armemu.h"
 #include <monty/mem.h>
@@ -69,6 +70,7 @@ ARMul_State *ARMul_NewState(void)
  unsigned i, j ;
 
     NEW(state);
+ memset (state, 0, sizeof (ARMul_State));
 
  state->Emulate = RUN ;
  for (i = 0 ; i < 16 ; i++) {

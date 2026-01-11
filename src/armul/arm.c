@@ -252,16 +252,30 @@ ARMul_MemoryExit(ARMul_State *state)
   mem_final();
 }
 
-ARMword
-inline ARMul_LoadInstrS(ARMul_State *state,ARMword address)
+inline ARMword
+ARMul_ReLoadInstr(ARMul_State *state,ARMword address,ARMword isize)
 {
-  return MEM_READ_WORD(address);
+  if (isize == 4 || (address & 3) == 0)
+    return MEM_READ_WORD(address);
+
+  return ((WORD)MEM_READ_BYTE(address+3) << 24) |
+         ((WORD)MEM_READ_BYTE(address+2) << 16) |
+         ((WORD)MEM_READ_BYTE(address+1) << 8) |
+         MEM_READ_BYTE(address);
 }
 
-inline ARMword ARMul_LoadInstrN(ARMul_State *state,ARMword address)
+inline ARMword
+ARMul_LoadInstrS(ARMul_State *state,ARMword address,ARMword isize)
 {
-  return MEM_READ_WORD(address);
+  return ARMul_ReLoadInstr(state, address, isize);
 }
+
+inline ARMword
+ARMul_LoadInstrN(ARMul_State *state,ARMword address,ARMword isize)
+{
+  return ARMul_ReLoadInstr(state, address, isize);
+}
+
 inline ARMword ARMul_LoadWordS(ARMul_State *state,ARMword address)
 {
   rsp_check_memory_read(address);
@@ -271,6 +285,12 @@ inline ARMword ARMul_LoadWordN(ARMul_State *state,ARMword address)
 {
   rsp_check_memory_read(address);
   return MEM_READ_WORD(address);
+}
+inline ARMword ARMul_LoadHalfWord(ARMul_State *state,ARMword address)
+{
+  ARMword offset = (address & 2) << 3;
+  rsp_check_memory_read(address);
+  return (MEM_READ_WORD(address) >> offset) & 0xffff;
 }
 inline ARMword ARMul_LoadByte(ARMul_State *state,ARMword address)
 {
@@ -286,6 +306,15 @@ inline void ARMul_StoreWordN(ARMul_State *state, ARMword address, ARMword data)
 {
   rsp_check_memory_write(address);
   MEM_WRITE_WORD(address, data);
+}
+inline void ARMul_StoreHalfWord(ARMul_State *state,ARMword address, ARMword data)
+{
+  ARMword temp, offset;
+  rsp_check_memory_write(address);
+  temp = ARMul_ReadWord(state,address);
+  offset = (address & 2) << 3;
+  MEM_WRITE_WORD(address, (temp & ~(0xffffL << offset)) | ((data & 0xffff) << offset));
+
 }
 inline void ARMul_StoreByte(ARMul_State *state, ARMword address, ARMword data)
 {
