@@ -200,7 +200,7 @@ CONST
    Socket_MsgDontroute = Socket_MsgFlags: %100;
 
 TYPE
-   Socket_S,
+   Socket_S = .Bits,
    Socket_Iovec =
    .Struct
    (  .Ref .Data: base,
@@ -534,7 +534,7 @@ SWI
       (  R0 # 0 "Deregister a filter with the Internet module - RISC OS 6",
          R1 = Socket_AF: addr_family,
          R2 = .Int: prot_hash,
-         R3 = .Asm: routine,
+         R3 -> .Asm: routine,
          R4 = .Int: priv_word
    )  ),
 
@@ -544,7 +544,7 @@ SWI
       (  R0 # 1 "Register a filter with the Internet module - RISC OS 6",
          R1 = Socket_AF: addr_family,
          R2 = .Int: prot_hash,
-         R3 = .Asm: routine,
+         R3 -> .Asm: routine,
          R4 = .Int: priv_word
    )  );
 
