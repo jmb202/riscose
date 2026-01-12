@@ -3233,9 +3233,9 @@ GetDPRegRHS (ARMul_State * state, ARMword instr)
 	  if (shamt == 0)
 	    return (base);
 	  else if (shamt >= 32)
-	    return ((ARMword) ((long int) base >> 31L));
+	    return ((ARMword) ((ARMsword) base >> 31L));
 	  else
-	    return ((ARMword) ((long int) base >> (int) shamt));
+	    return ((ARMword) ((ARMsword) base >> (int) shamt));
 	case ROR:
 	  shamt &= 0x1f;
 	  if (shamt == 0)
@@ -3264,9 +3264,9 @@ GetDPRegRHS (ARMul_State * state, ARMword instr)
 	    return (base >> shamt);
 	case ASR:
 	  if (shamt == 0)
-	    return ((ARMword) ((long int) base >> 31L));
+	    return ((ARMword) ((ARMsword) base >> 31L));
 	  else
-	    return ((ARMword) ((long int) base >> (int) shamt));
+	    return ((ARMword) ((ARMsword) base >> (int) shamt));
 	case ROR:
 	  if (shamt == 0)	/* its an RRX */
 	    return ((base >> 1) | (CFLAG << 31));
@@ -3345,12 +3345,12 @@ GetDPSRegRHS (ARMul_State * state, ARMword instr)
 	  else if (shamt >= 32)
 	    {
 	      ASSIGNC (base >> 31L);
-	      return ((ARMword) ((long int) base >> 31L));
+	      return ((ARMword) ((ARMsword) base >> 31L));
 	    }
 	  else
 	    {
-	      ASSIGNC ((ARMword) ((long int) base >> (int) (shamt - 1)) & 1);
-	      return ((ARMword) ((long int) base >> (int) shamt));
+	      ASSIGNC ((ARMword) ((ARMsword) base >> (int) (shamt - 1)) & 1);
+	      return ((ARMword) ((ARMsword) base >> (int) shamt));
 	    }
 	case ROR:
 	  if (shamt == 0)
@@ -3397,12 +3397,12 @@ GetDPSRegRHS (ARMul_State * state, ARMword instr)
 	  if (shamt == 0)
 	    {
 	      ASSIGNC (base >> 31L);
-	      return ((ARMword) ((long int) base >> 31L));
+	      return ((ARMword) ((ARMsword) base >> 31L));
 	    }
 	  else
 	    {
-	      ASSIGNC ((ARMword) ((long int) base >> (int) (shamt - 1)) & 1);
-	      return ((ARMword) ((long int) base >> (int) shamt));
+	      ASSIGNC ((ARMword) ((ARMsword) base >> (int) (shamt - 1)) & 1);
+	      return ((ARMword) ((ARMsword) base >> (int) shamt));
 	    }
 	case ROR:
 	  if (shamt == 0)
@@ -3494,9 +3494,9 @@ GetLSRegRHS (ARMul_State * state, ARMword instr)
 	return (base >> shamt);
     case ASR:
       if (shamt == 0)
-	return ((ARMword) ((long int) base >> 31L));
+	return ((ARMword) ((ARMsword) base >> 31L));
       else
-	return ((ARMword) ((long int) base >> (int) shamt));
+	return ((ARMword) ((ARMsword) base >> (int) shamt));
     case ROR:
       if (shamt == 0)		/* its an RRX */
 	return ((base >> 1) | (CFLAG << 31));

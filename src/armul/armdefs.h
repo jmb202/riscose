@@ -35,6 +35,7 @@ typedef char * VoidStar ;
 #endif
 
 typedef uint32_t ARMword ; /* must be 32 bits wide */
+typedef int32_t ARMsword ;
 
 typedef struct ARMul_State ARMul_State ;
 
