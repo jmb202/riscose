@@ -64,6 +64,7 @@ static hash *registered_swi;
     X(resourcefs) \
     X(sharedclibrary) \
     X(sharedunixlibrary) \
+    X(socket) \
     X(taskwindow) \
     X(territory) \
     X(wimpreadsysinfo)

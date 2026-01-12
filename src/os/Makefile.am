@@ -24,6 +24,7 @@ libos_a_SOURCES = \
     resourcefs.c \
     sharedclib.c \
     sharedunixlibrary.c \
+    socket.c \
     taskwindow.c \
     territory.c \
     utilitymod.c \
