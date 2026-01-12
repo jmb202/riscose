@@ -41,6 +41,7 @@ BUILT_SOURCES = \
     osword.c osword.h osword.e \
     resourcefs.c resourcefs.h resourcefs.e \
     sharedunixlibrary.c sharedunixlibrary.h sharedunixlibrary.e \
+    socket.c socket.h socket.e \
     taskwindow.c taskwindow.h taskwindow.e \
     territory.c territory.h territory.e \
     wimp.c wimp.h wimp.e \
