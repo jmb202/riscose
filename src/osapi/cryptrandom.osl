@@ -1,0 +1,31 @@
+TITLE CryptRandom;
+AUTHOR "John-Mark Bell, jmb@netsurf-browser.org";
+
+NEEDS OS;
+
+CONST
+   Error_CryptRandomNullPointer = .Bits: &815111;
+
+SWI CryptRandom_Byte = ( NUMBER &51980,
+   EXIT (
+      R0 = .Byte: value
+   )
+);
+SWI CryptRandom_Stir = ( NUMBER &51981 );
+SWI CryptRandom_AddNoise = ( NUMBER &51982,
+   ENTRY (
+      R0 -> .Byte: buf,
+      R1 = .Int: size
+   )
+);
+SWI CryptRandom_Block = ( NUMBER &51983,
+   ENTRY (
+     R0 -> .Byte: buf,
+      R1 = .Int: len
+   )
+);
+SWI CryptRandom_Word = ( NUMBER &51984,
+   EXIT (
+      R0 = .Bytes: value
+   )
+)

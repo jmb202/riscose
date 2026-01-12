@@ -5,6 +5,7 @@ AM_CPPFLAGS = -I$(srcdir)/../oslib -I$(srcdir)/../include -I.. \
 
 libos_a_SOURCES = \
     basictrans.c \
+    cryptrandom.c \
     ddeutils.c \
     fileswitch.c \
     fpemulator.c \
