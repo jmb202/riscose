@@ -4,7 +4,11 @@ AUTHOR "Jonathan Coxhead, jonathan@doves.demon.co.uk, 22 Aug 1995";
 NEEDS OS;
 
 TYPE
-   Socket_AF = .Short;
+   Socket5_Len = .Byte;
+
+TYPE
+   Socket_AF = .Short,
+   Socket5_AF = .Byte;
 CONST
    Socket_AFInet = Socket_AF: 2;
 
@@ -35,6 +39,26 @@ TYPE Socket_SockaddrIn =
       .Short: port,
       .Bits: addr,
       [8] .Byte: data
+   );
+
+TYPE Socket5_SockaddrIn =
+   .Struct
+   (  Socket5_Len: len,
+      Socket5_AF: af,
+      .Short: port,
+      .Bits: addr,
+      [8] .Byte: data
+   );
+
+TYPE Socket5_Sockaddr =
+   .Union
+   (
+      .Struct
+      (  Socket5_Len: len,
+         Socket5_AF:  af,
+         [14] .Byte:  data
+      ): sockaddr,
+      Socket5_SockaddrIn: sockaddr_in
    );
 
 TYPE Socket_Sockaddr =
@@ -214,6 +238,16 @@ TYPE
       .Int: iov_count,
       .Ref .Data: accrights,
       .Int: accrightslen
+   ),
+   Socket5_Msghdr =
+   .Struct
+   (  .Ref .Data: name,
+      .Int: namelen,
+      .Ref Socket_Iovec: iov,
+      .Int: iov_count,
+      .Ref .Data: control,
+      .Int: controllen,
+      .Int: msg_flags
    );
 
 SWI
@@ -483,33 +517,66 @@ SWI
    ),
 
    Socket_Accept_1 =
-   (  NUMBER 0x4121B*,
-      ABSENT
-   ),
+   (  NUMBER 0x4121B "Accepts a connection on a socket",
+      ENTRY
+      (  R0 = Socket_S: s,
+         R1 = .Ref Socket5_Sockaddr: sockaddr,
+         R2 = .Ref .Int: addrlen
+      ),
+      EXIT
+      (  R0! = Socket_S: ns
+   )  ),
 
    Socket_Recvfrom_1 =
-   (  NUMBER 0x4121C*,
-      ABSENT
-   ),
+   (  NUMBER 0x4121C "Receives data from a socket",
+      ENTRY
+      (  R0 = Socket_S: s,
+         R1 = .Ref .Data: buf,
+         R2 = .Int: len,
+         R3 = Socket_MsgFlags: flags,
+         R4 = .Ref Socket5_Sockaddr: from,
+         R5 = .Ref .Int: fromlen
+      ),
+      EXIT
+      (  R0! = .Int: cc
+   )  ),
 
    Socket_Recvmsg_1 =
-   (  NUMBER 0x4121D*,
-      ABSENT
-   ),
+   (  NUMBER 0x4121D "Receives a message from a socket",
+      ENTRY
+      (  R0 = Socket_S: s,
+         R1 = .Ref Socket5_Msghdr: msg,
+         R2 = Socket_MsgFlags: flags
+      ),
+      EXIT
+      (  R0! = .Int: cc
+   )  ),
 
    Socket_Sendmsg_1 =
-   (  NUMBER 0x4121E*,
-      ABSENT
-   ),
+   (  NUMBER 0x4121E "Sends a message from a socket",
+      ENTRY
+      (  R0 = Socket_S: s,
+         R1 -> Socket5_Msghdr: msg,
+         R2 = Socket_MsgFlags: flags
+      ),
+      EXIT
+      (  R0! = .Int: cc
+   )  ),
    Socket_Getpeername_1 =
-   (  NUMBER 0x4121F*,
-      ABSENT
-   ),
+   (  NUMBER 0x4121F "Gets name of connected peer",
+      ENTRY
+      (  R0 = Socket_S: s,
+         R1 = .Ref Socket5_Sockaddr: sockaddr,
+         R2 = .Ref .Int: namelen
+   )  ),
 
    Socket_Getsockname_1 =
-   (  NUMBER 0x41220*,
-      ABSENT
-   ),
+   (  NUMBER 0x41220 "Gets socket name",
+      ENTRY
+      (  R0 =  Socket_S: s,
+         R1 = .Ref Socket5_Sockaddr: sockaddr,
+         R2 = .Ref .Int: namelen
+   )  ),
 
    Socket_InternalLookup =
    (  NUMBER 0x41221*,

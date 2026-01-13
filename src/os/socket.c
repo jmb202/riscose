@@ -256,6 +256,67 @@ os_error *xsocket_gettsize(int32_t *size)
     return ERR_NO_SUCH_SWI();
 }
 
+/* ---- xsocket_accept_1 -------------------------------------------- */
+
+os_error *xsocket_accept_1(socket_s s,
+    socket5_sockaddr *sockaddr,
+    int32_t *addrlen,
+    socket_s *ns)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xsocket_recvfrom_1 ------------------------------------------ */
+
+os_error *xsocket_recvfrom_1(socket_s s,
+    byte *buf,
+    int32_t len,
+    socket_msg_flags flags,
+    socket5_sockaddr *from,
+    int32_t *fromlen,
+    int32_t *cc)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xsocket_recvmsg_1 ------------------------------------------- */
+
+os_error *xsocket_recvmsg_1(socket_s s,
+    socket5_msghdr *msg,
+    socket_msg_flags flags,
+    int32_t *cc)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xsocket_sendmsg_1 ------------------------------------------- */
+
+os_error *xsocket_sendmsg_1(socket_s s,
+    socket5_msghdr *msg,
+    socket_msg_flags flags,
+    int32_t *cc)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xsocket_getpeername_1 --------------------------------------- */
+
+os_error *xsocket_getpeername_1(socket_s s,
+    socket5_sockaddr *sockaddr,
+    int32_t *namelen)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xsocket_getsockname_1 --------------------------------------- */
+
+os_error *xsocket_getsockname_1(socket_s s,
+    socket5_sockaddr *sockaddr,
+    int32_t *namelen)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
 /* ---- xsocket_version --------------------------------------------- */
 
 os_error *xsocket_version(int32_t *n)
