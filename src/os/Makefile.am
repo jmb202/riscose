@@ -10,6 +10,7 @@ libos_a_SOURCES = \
     fileswitch.c \
     fpemulator.c \
     hourglass.c \
+    iconvmod.c \
     messagetrans.c \
     misc.c \
     module.c \

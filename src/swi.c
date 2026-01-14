@@ -53,6 +53,7 @@ static hash *registered_swi;
     X(ddeutils) \
     X(fpemulator) \
     X(hourglass) \
+    X(iconvmod) \
     X(os) \
     X(osargs) \
     X(osbyte) \

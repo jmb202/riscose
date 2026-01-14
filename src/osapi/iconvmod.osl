@@ -1,0 +1,86 @@
+TITLE IconvMod;
+AUTHOR "John-Mark Bell, jmb@netsurf-browser.org";
+
+NEEDS OS;
+
+Type Iconv_CD = .Int;
+
+CONST
+   Error_IconvNoMem = .Bits: &81B900,
+   Error_IconvInval = .Bits: &81B901,
+   Error_Iconv2Big  = .Bits: &81B902,
+   Error_IconvIlseq = .Bits: &81B903;
+
+SWI Iconv_Open = ( NUMBER &57540,
+   ENTRY (
+      R0 -> .String: tocode,
+      R1 -> .String: fromcode
+   ),
+   EXIT (
+      R0 = Iconv_CD: cd
+   )
+);
+
+SWI Iconv_Iconv = ( NUMBER &57541,
+   ENTRY (
+      R0 = Iconv_CD: cd,
+      R1 -> .Ref .String: inbuf,
+      R2 -> .Int: inlen,
+      R3 -> .Ref .String: outbuf,
+      R4 -> .Int: outlen
+   ),
+   EXIT (
+      R0 = .Int: nrcount
+   )
+);
+
+SWI Iconv_Close = ( NUMBER &57542,
+   ENTRY (
+      R0 = Iconv_CD: cd
+   )
+);
+
+SWI Iconv_Convert = ( NUMBER &57543,
+   ENTRY (
+      R0 = Iconv_CD: cd,
+      R1 -> .String: inbuf,
+      R2 = .Int: inlen,
+      R3 -> .String: outbuf,
+      R4 = .Int: outlen
+   ),
+   EXIT (
+      R0 = .Int: nrcount,
+      R1 -> .String: out_inbuf,
+      R2 = .Int: out_inlen,
+      R3 -> .String: out_outbuf,
+      R4 = .Int: out_outlen
+   )
+);
+
+SWI Iconv_CreateMenu = ( NUMBER &57544,
+   ENTRY (
+      R0 = .Bits: flags,
+      R1 -> .Byte: buffer,
+      R2 = .Int: buflen,
+      R3 -> .String: selenc,
+      R4 -> .Byte: indbuf,
+      R5 = .Int: indbuflen
+   ),
+   EXIT (
+      R2 = .Int: out_buflen,
+      R5 = .Int: out_indbuflen
+   )
+);
+
+SWI Iconv_DecodeMenu = ( NUMBER &57545,
+   ENTRY (
+      R0 = .Bits: flags,
+      R1 -> .Byte: menudef,
+      R2 -> .Byte: selections,  // XXX: better type?
+      R3 -> .Byte: buf,
+      R4 = .Int: buflen
+   ),
+   EXIT (
+      R4 = .Int: out_buflen
+   )
+)

@@ -29,6 +29,7 @@ BUILT_SOURCES = \
     font.c font.h font.e \
     fpemulator.c fpemulator.h fpemulator.e \
     hourglass.c hourglass.h hourglass.e \
+    iconvmod.c iconvmod.h iconvmod.e \
     messagetrans.c messagetrans.h messagetrans.e \
     osargs.c osargs.h osargs.e \
     osbyte.c osbyte.h osbyte.e \
