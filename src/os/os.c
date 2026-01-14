@@ -835,15 +835,62 @@ os_error *xos_read_var_val (char *var,
       int *context_out,
       os_var_type *var_type_out)
 {
-  fprintf(stderr, "Pretending environment variable %s does not exist\n", var);
-  *used = 0;
+  char name[1024];
+  const char *val;
+
+  for (size_t i = 0; i < sizeof(name); i++) {
+    if ('a' <= var[i] && var[i] <= 'z') {
+      name[i] = var[i] & ~0x20;
+    } else if ('A' <= var[i] && var[i] <= 'Z') {
+      name[i] = var[i];
+    } else if (var[i] == '$') {
+      name[i] = '_';
+    } else if (var[i] < 32) {
+      name[i] = '\0';
+      break;
+    } else {
+      /* Unsupported name: pretend it doesn't exist */
+      fprintf(stderr, "Pretending environment variable %s does not exist\n",
+          var);
+      *used = 0;
+      *context_out = 0;
+      *var_type_out = os_VARTYPE_STRING;
+      /* The real thing returns code &1e6 with a suitable error message
+       * when the variable cannot be found.  We don't have an error defined,
+       * but no such swi also uses &1e6 (and nothing should be relying on
+       * the error message content) */
+      return ERR_NO_SUCH_SWI();
+    }
+  }
+  name[sizeof(name)-1] = '\0';
+
+  val = getenv(name);
+  if (val == NULL) {
+    fprintf(stderr, "Environment variable '%s' does not exist\n", name);
+    *used = 0;
+    *context_out = 0;
+    *var_type_out = os_VARTYPE_STRING;
+    /* The real thing returns code &1e6 with a suitable error message
+     * when the variable cannot be found.  We don't have an error defined,
+     * but no such swi also uses &1e6 (and nothing should be relying on
+     * the error message content) */
+    return ERR_NO_SUCH_SWI();
+  }
+
+  if (size & 0x80000000) {
+    /* Bit 31 set: report NOT(length) */
+    *used = ~strlen(val);
+  } else {
+    *used = strlen(val);
+    if (*used > size)
+      *used = size;
+    memcpy(value, val, *used);
+  }
+
   *context_out = 0;
-  *var_type_out = 0;
-  /* The real thing returns code &1e6 with a suitable error message
-   * when the variable cannot be found.  We don't have an error defined,
-   * but no such swi also uses &1e6 (and nothing should be relying on
-   * the error message content) */
-  return ERR_NO_SUCH_SWI();
+  *var_type_out = os_VARTYPE_STRING;
+
+  return NULL;
 }
 
 /* ------------------------------------------------------------------------
