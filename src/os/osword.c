@@ -8,11 +8,13 @@
 **   Template written by defmod (riscose version 1.00)
 */
 
-#include <stdio.h>
 #include <assert.h>
-#include <sys/time.h>
+#include <inttypes.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
+
 #include <monty/monty.h>
 #include "types.h"
 #include "osword.h"
@@ -35,13 +37,17 @@ void osword_swi_register_extra(void)
 
 os_error *xosword_read_system_clock (osword_timer_block *clock)
 {
+  uint64_t time_ros;
   struct timeval tv;
-  if (gettimeofday(&tv, NULL)!=0) abort();
-  unsigned long int time_ros = tv.tv_sec * 100UL + 613608L*3600L*100L;
-  time_ros += tv.tv_usec / 1000UL;
 
-  assert(sizeof(time_ros)==8);
-  memcpy(((void*) &time_ros)+3, clock, 5);
+  if (gettimeofday(&tv, NULL) != 0) abort();
+
+  time_ros = tv.tv_sec * 100UL + 613608L*3600L*100L + tv.tv_usec / 1000UL;
+
+  for (size_t i = 0; i < sizeof(clock->b); i++) {
+    clock->b[i] = time_ros & 0xff;
+    time_ros >>= 8;
+  }
 
   return 0;
 }
