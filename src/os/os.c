@@ -262,6 +262,11 @@ os_error *xos_cli (char *command)
       fprintf(stderr, "*%s ignored\n", command);
       return 0;
   }
+  if (!strcmp(command, "RMEnsure Iconv 0.04 RMload System:Modules.Iconv") || !strcmp(command, "RMEnsure Iconv 0.04 Error 16_10F iconv support requires the Iconv module 0.04 or newer")) {
+      fprintf(stderr, "*%s ignored\n", command);
+      return 0;
+  }
+
   error("*** '*%s' unimplemented\n", command);
   return 0;
 }
