@@ -5,9 +5,11 @@
  *
  * Created by defmod, riscose version 1.01. */
 
-#include <stdio.h>
 #include <assert.h>
 #include <ctype.h>
+#include <inttypes.h>
+#include <stdio.h>
+#include <time.h>
 
 #include "monty/monty.h"
 #include "types.h"
@@ -99,7 +101,34 @@ os_error *xterritory_read_current_time_zone(char **timezone,
 os_error *xterritory_convert_time_to_utc_ordinals(os_date_and_time *date_and_time,
     territory_ordinals *ordinals)
 {
-    return ERR_NO_SUCH_SWI();
+    uint64_t ts = 0;
+    struct tm *tm;
+    time_t t;
+
+    if (date_and_time == NULL || ordinals == NULL)
+        return ERR_BAD_PARAMETERS();
+
+    for (size_t i = 0; i < sizeof(*date_and_time); i++) {
+        ts <<= 8;
+        ts |= (*date_and_time)[i];
+    }
+
+    ordinals->centisecond = ts % 100;
+    t = (ts / 100) - 2208988800L;
+    tm = gmtime(&t);
+    if (tm == NULL)
+        return ERR_BAD_TIME();
+
+    ordinals->second = tm->tm_sec;
+    ordinals->minute = tm->tm_min;
+    ordinals->hour = tm->tm_hour;
+    ordinals->date = tm->tm_mday;
+    ordinals->month = tm->tm_mon + 1;
+    ordinals->year = tm->tm_year + 1900;
+    ordinals->weekday = tm->tm_wday + 1;
+    ordinals->yearday = tm->tm_yday + 1;
+
+    return NULL;
 }
 
 /* ---- xterritory_read_time_zones ---------------------------------- */
