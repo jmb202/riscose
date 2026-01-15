@@ -148,7 +148,7 @@ char *host_path_from_ro_path(const char *ropath)
   }
 
   /* Unixify */
-  fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-ropath), ropath);
+  //fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-ropath), ropath);
   for (end = ropath, p = out; *end > 31; end++) {
     switch (*end) {
       case '$': /* Root of disc */
@@ -178,7 +178,7 @@ char *host_path_from_ro_path(const char *ropath)
     }
   }
   *p = '\0';
-  fprintf(stderr, "-> hpfrp: '%s'\n", out);
+  //fprintf(stderr, "-> hpfrp: '%s'\n", out);
 
   return out;
 }
