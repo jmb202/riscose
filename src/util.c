@@ -139,6 +139,14 @@ char *host_path_from_ro_path(const char *ropath)
   if (out == NULL)
     return NULL;
 
+  if (ropath[0] == '.' || ropath[0] == '/') {
+    /* Assume path is already in host format */
+    for (end = ropath, p = out; *end > 31; end++)
+      *p++ = *end;
+    *p++ = '\0';
+    return out;
+  }
+
   /* Unixify */
   fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-ropath), ropath);
   for (end = ropath, p = out; *end > 31; end++) {
