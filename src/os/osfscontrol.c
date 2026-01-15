@@ -312,9 +312,35 @@ os_error *xosfscontrol_canonicalise_path(char *path_name,
     int size,
     int *spare)
 {
-    strncpy(path_name, buffer, size);
-    *spare = 0;
-    fprintf(stderr, "xosfscontrol_canonicalise_path not implemented for: %s\n", path_name);
+    //fprintf(stderr, "xosfscontrol_canonicalise_path(%p, %p, %p, %p, %d, %p)\n",
+    //    path_name, buffer, var, path, size, spare);
+
+    if (path_name == NULL)
+        return ERR_BAD_PARAMETERS();
+
+    if (buffer == NULL && size == 0) {
+        /* Measure length */
+        while (*path_name > 31) {
+            path_name++;
+            size--;
+        }
+	size--;
+    } else {
+        /* Canonicalise */
+        const char *orig_buffer = buffer;
+        const char *orig_path_name = path_name;
+        int orig_size = size;
+
+        while (*path_name > 31 && size > 0) {
+            *buffer++ = *path_name++;
+            size--;
+        }
+        *buffer = '\0';
+
+        //fprintf(stderr, "xosfscontrol_canonicalise_path: '%.*s' -> '%s'\n",
+        //    orig_size - size, orig_path_name, orig_buffer);
+    }
+    *spare = size;
 
     return NULL;
 }
