@@ -109,7 +109,7 @@ os_error *xsocket_creat(socket_af af,
     int domain, type, protocol;
     int sockfd;
 
-    fprintf(stderr, "socket(%d, %d, %d)\n", af, sock, proto);
+    //fprintf(stderr, "socket(%d, %d, %d)\n", af, sock, proto);
 
     if (af != socket_AF_INET)
         return set_error(EAFNOSUPPORT);
@@ -153,7 +153,7 @@ os_error *xsocket_creat(socket_af af,
         return set_error(errno);
     *s = (socket_s) sockfd;
 
-    fprintf(stderr, "socket(%d, %d, %d) => %d\n", af, sock, proto, sockfd);
+    //fprintf(stderr, "socket(%d, %d, %d) => %d\n", af, sock, proto, sockfd);
 
     return NULL;
 }
@@ -166,7 +166,7 @@ os_error *xsocket_bind(socket_s s,
 {
     struct sockaddr_in addr;
 
-    fprintf(stderr, "bind(%d, %p, %d)\n", s, sockaddr, namelen);
+    //fprintf(stderr, "bind(%d, %p, %d)\n", s, sockaddr, namelen);
 
     if (sockaddr == NULL || namelen != sizeof(*sockaddr))
         return set_error(EINVAL);
@@ -181,12 +181,12 @@ os_error *xsocket_bind(socket_s s,
     addr.sin_port = sockaddr->sockaddr_in.port;
     addr.sin_addr.s_addr = sockaddr->sockaddr_in.addr;
 
-    fprintf(stderr, "binding %d to %d.%d.%d.%d:%d\n", s,
-        addr.sin_addr.s_addr & 0xff,
-        (addr.sin_addr.s_addr >> 8) & 0xff,
-        (addr.sin_addr.s_addr >> 16) & 0xff,
-        (addr.sin_addr.s_addr >> 24) & 0xff,
-        ntohs(addr.sin_port));
+    //fprintf(stderr, "binding %d to %d.%d.%d.%d:%d\n", s,
+    //    addr.sin_addr.s_addr & 0xff,
+    //    (addr.sin_addr.s_addr >> 8) & 0xff,
+    //    (addr.sin_addr.s_addr >> 16) & 0xff,
+    //    (addr.sin_addr.s_addr >> 24) & 0xff,
+    //    ntohs(addr.sin_port));
 
     if (bind(s, (struct sockaddr *) &addr, sizeof(addr)) == -1)
         return set_error(errno);
@@ -199,7 +199,7 @@ os_error *xsocket_bind(socket_s s,
 os_error *xsocket_listen(socket_s s,
     int32_t backlog)
 {
-    fprintf(stderr, "listen(%d, %d)\n", s, backlog);
+    //fprintf(stderr, "listen(%d, %d)\n", s, backlog);
 
     if (listen(s, backlog) == -1)
         return set_error(errno);
@@ -233,7 +233,7 @@ os_error *xsocket_connect(socket_s s,
 {
     struct sockaddr_in addr;
 
-    fprintf(stderr, "connect(%d, %p, %d)\n", s, sockaddr, namelen);
+    //fprintf(stderr, "connect(%d, %p, %d)\n", s, sockaddr, namelen);
 
     if (sockaddr == NULL || namelen != sizeof(*sockaddr))
         return set_error(EINVAL);
@@ -248,12 +248,12 @@ os_error *xsocket_connect(socket_s s,
     addr.sin_port = sockaddr->sockaddr_in.port;
     addr.sin_addr.s_addr = sockaddr->sockaddr_in.addr;
 
-    fprintf(stderr, "connecting %d to %d.%d.%d.%d:%d\n", s,
-        addr.sin_addr.s_addr & 0xff,
-        (addr.sin_addr.s_addr >> 8) & 0xff,
-        (addr.sin_addr.s_addr >> 16) & 0xff,
-        (addr.sin_addr.s_addr >> 24) & 0xff,
-        ntohs(addr.sin_port));
+    //fprintf(stderr, "connecting %d to %d.%d.%d.%d:%d\n", s,
+    //    addr.sin_addr.s_addr & 0xff,
+    //    (addr.sin_addr.s_addr >> 8) & 0xff,
+    //    (addr.sin_addr.s_addr >> 16) & 0xff,
+    //    (addr.sin_addr.s_addr >> 24) & 0xff,
+    //    ntohs(addr.sin_port));
 
     if (connect(s, (struct sockaddr *) &addr, sizeof(addr)) == -1)
         return set_error(errno);
@@ -378,8 +378,8 @@ os_error *xsocket_sendto(socket_s s,
     int fl = 0;
     ssize_t sent;
 
-    fprintf(stderr, "sendto(%d, %p, %d, %x, %p, %d)\n",
-        s, msg, len, flags, to, tolen);
+    //fprintf(stderr, "sendto(%d, %p, %d, %x, %p, %d)\n",
+    //    s, msg, len, flags, to, tolen);
 
     if (to == NULL || tolen != sizeof(*to))
         return set_error(EINVAL);
@@ -439,7 +439,7 @@ os_error *xsocket_shutdown(socket_s s,
 {
     int how;
 
-    fprintf(stderr, "shutdown(%d, %d)\n", s, type);
+    //fprintf(stderr, "shutdown(%d, %d)\n", s, type);
 
     switch (type) {
         case socket_SHUTDOWN_RECV:
@@ -466,8 +466,8 @@ os_error *xsocket_setsockopt(socket_s s,
 {
     int l, o, v;
 
-    fprintf(stderr, "setsockopt(%d, %d, %d, %p, %d)\n",
-        s, level, optname, optval, optlen);
+    //fprintf(stderr, "setsockopt(%d, %d, %d, %p, %d)\n",
+    //    s, level, optname, optval, optlen);
 
     if (optval == NULL || optlen == 0)
         return set_error(EINVAL);
@@ -518,8 +518,8 @@ os_error *xsocket_setsockopt(socket_s s,
     if (setsockopt(s, l, o, &v, sizeof(v)) == -1)
         return set_error(errno);
 
-    fprintf(stderr, "-> setsockopt(%d, %d, %d, %d, %zu)\n",
-        s, l, o, v, sizeof(v));
+    //fprintf(stderr, "-> setsockopt(%d, %d, %d, %d, %zu)\n",
+    //    s, l, o, v, sizeof(v));
 
     return NULL;
 }
@@ -535,8 +535,8 @@ os_error *xsocket_getsockopt(socket_s s,
     int l, o, v;
     socklen_t e = sizeof(v);
 
-    fprintf(stderr, "getsockopt(%d, %d, %d, %p, %p)\n",
-        s, level, optname, optval, optlen);
+    //fprintf(stderr, "getsockopt(%d, %d, %d, %p, %p)\n",
+    //    s, level, optname, optval, optlen);
 
     if (optval == NULL || optlen == NULL)
         return set_error(EINVAL);
@@ -592,8 +592,8 @@ os_error *xsocket_getsockopt(socket_s s,
     }
     *optlen = sizeof(int32_t);
 
-    fprintf(stderr, "-> getsockopt(%d, %d, %d, %d, %d)\n",
-        s, level, optname, *optval, *optlen);
+    //fprintf(stderr, "-> getsockopt(%d, %d, %d, %d, %d)\n",
+    //    s, level, optname, *optval, *optlen);
 
     return NULL;
 }
@@ -636,7 +636,7 @@ os_error *xsocket_getsockname(socket_s s,
 
 os_error *xsocket_close(socket_s s)
 {
-    fprintf(stderr, "close(%d)\n", s);
+    //fprintf(stderr, "close(%d)\n", s);
     if (close(s) == -1)
         return set_error(errno);
     return NULL;
@@ -806,7 +806,7 @@ os_error *xsocket_writev(socket_s s,
 
 os_error *xsocket_gettsize(int32_t *size)
 {
-    fprintf(stderr, "gettsize(%p)\n", size);
+    //fprintf(stderr, "gettsize(%p)\n", size);
 
     /* As good an answer as any */
     *size = 256;
@@ -825,7 +825,7 @@ os_error *xsocket_accept_1(socket_s s,
     socklen_t alen = sizeof(addr);
     int sockfd;
 
-    fprintf(stderr, "accept_1(%d, %p, %p, %p)\n", s, sockaddr, addrlen, ns);
+    //fprintf(stderr, "accept_1(%d, %p, %p, %p)\n", s, sockaddr, addrlen, ns);
 
     if (sockaddr != NULL &&
         (addrlen == NULL || *addrlen < sizeof(*sockaddr)))
@@ -936,7 +936,7 @@ os_error *xsocket_getpeername_1(socket_s s,
     struct sockaddr_in *inaddr;
     socklen_t alen = sizeof(addr);
 
-    fprintf(stderr, "getpeername_1(%d, %p, %p)\n", s, sockaddr, namelen);
+    //fprintf(stderr, "getpeername_1(%d, %p, %p)\n", s, sockaddr, namelen);
 
     if (sockaddr == NULL || namelen == NULL || *namelen < sizeof(*sockaddr))
         return set_error(EINVAL);
@@ -967,7 +967,7 @@ os_error *xsocket_getsockname_1(socket_s s,
     struct sockaddr_in *inaddr;
     socklen_t alen = sizeof(addr);
 
-    fprintf(stderr, "getsockname_1(%d, %p, %p)\n", s, sockaddr, namelen);
+    //fprintf(stderr, "getsockname_1(%d, %p, %p)\n", s, sockaddr, namelen);
 
     if (sockaddr == NULL || namelen == NULL || *namelen < sizeof(*sockaddr))
         return set_error(EINVAL);
