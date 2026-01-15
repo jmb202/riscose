@@ -5,7 +5,10 @@
  *
  * Created by defmod, riscose version 1.01. */
 
+#include <errno.h>
+#include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "monty/monty.h"
 #include "types.h"
@@ -24,7 +27,14 @@ void osargs_swi_register_extra(void)
 os_error *xosargs_read_ptrw(os_fw file,
     int *ptr)
 {
-    return ERR_NO_SUCH_SWI();
+    off_t pos;
+
+    pos = lseek(file, 0, SEEK_CUR);
+    if (pos == (off_t) -1)
+        return ERR_OUT_OF_RANGE();
+
+    *ptr = (int) pos;
+    return NULL;
 }
 
 /* ---- xosargs_read_temporary_fs ----------------------------------- */
@@ -115,7 +125,31 @@ os_error *xosargs_read_infow(os_fw file,
     osargs_stream_status *stream_status,
     fileswitch_fs_info *fs_info)
 {
-    return ERR_NO_SUCH_SWI();
+    int flags;
+
+    flags = fcntl(file, F_GETFL, NULL);
+    if (flags == -1 && errno == EBADF) {
+        /* Not an fd: say so */
+        *stream_status = osargs_STREAM_UNALLOCATED;
+        *fs_info = 0;
+        return NULL;
+    } else if (flags == -1)
+        return ERR_BAD_PARAMETERS();
+
+    *stream_status = osargs_STREAM_SUPPORTS_GBPB | osargs_STREAM_UNBUFFERED;
+    if ((flags & O_ACCMODE) == O_RDONLY)
+      *stream_status |= osargs_STREAM_READABLE;
+    else if ((flags & O_ACCMODE) == O_WRONLY)
+      *stream_status |= osargs_STREAM_WRITABLE;
+    else if ((flags & O_ACCMODE) == O_RDWR)
+      *stream_status |= (osargs_STREAM_READABLE | osargs_STREAM_WRITABLE);
+
+    /* XXX: STREAM_WRITTEN/EOF_ERROR_ON_NEXT_READ? */
+
+    /* XXX: what to report here? */
+    *fs_info = 0;
+
+    return NULL;
 }
 
 /* ---- xosargs_ensurew --------------------------------------------- */
