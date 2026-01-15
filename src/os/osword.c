@@ -37,16 +37,19 @@ void osword_swi_register_extra(void)
 
 os_error *xosword_read_system_clock (osword_timer_block *clock)
 {
-  uint64_t time_ros;
+  uint64_t time_cs;
   struct timeval tv;
 
   if (gettimeofday(&tv, NULL) != 0) abort();
 
-  time_ros = tv.tv_sec * 100UL + 613608L*3600L*100L + tv.tv_usec / 1000UL;
+  /* Convert time to centiseconds */
+  time_cs = tv.tv_sec * 100 + tv.tv_usec / 10000;
+  /* Adjust epoch to 1900-01-01 */
+  time_cs += 220898880000UL;
 
   for (size_t i = 0; i < sizeof(clock->b); i++) {
-    clock->b[i] = time_ros & 0xff;
-    time_ros >>= 8;
+    clock->b[i] = time_cs & 0xff;
+    time_cs >>= 8;
   }
 
   return 0;
