@@ -58,8 +58,9 @@ static hash *registered_swi;
     X(osargs) \
     X(osbyte) \
     X(osfile) \
-    X(osfscontrol) \
     X(osfind) \
+    X(osfscontrol) \
+    X(osgbpb) \
     X(osmodule) \
     X(osword) \
     X(resourcefs) \
