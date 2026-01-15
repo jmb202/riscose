@@ -16,10 +16,30 @@ SWI OS_Find = (NUMBER 0xD "Opens and closes files -
       see individual reason codes", ABSENT);
 
 SWI
-   OSFind_Openin =
+   OSFind_OpenupWithNoPath =
    (  NUMBER 13,
       ENTRY
-      (  R0 # 0x40 "Opens an existing file with read access only. Prefer OSFind_OpeninW",
+      (  R0 # 0xC3 "Opens an existing file with read/write access. Prefer OSFind_OpenupW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpenupWithNoPathW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0xC3 "Opens an existing file with read/write access. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpenupWithPathVar =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0xC2 "Opens an existing file with read/write access. Prefer OSFind_OpenupW",
          R0 | OSFind_Flags: flags,
          R1 -> .String: file_name,
          R2 -> .String: path
@@ -27,10 +47,10 @@ SWI
       EXIT (R0! = OS_F: file)
    ),
 
-   OSFind_OpeninW =
+   OSFind_OpenupWithPathVarW =
    (  NUMBER 13,
       ENTRY
-      (  R0 # 0x40 "Opens an existing file with read access only. Uses 32-bit file handle.",
+      (  R0 # 0xC2 "Opens an existing file with read/write access. Uses 32-bit file handle.",
          R0 | OSFind_Flags: flags,
          R1 -> .String: file_name,
          R2 -> .String: path
@@ -38,10 +58,10 @@ SWI
       EXIT (R0! = OS_FW: file)
    ),
 
-   OSFind_Openout =
+   OSFind_OpenupWithPath =
    (  NUMBER 13,
       ENTRY
-      (  R0 # 0x80 "Creates a new file with read/write access. Prefer OSFind_OpenoutW",
+      (  R0 # 0xC1 "Opens an existing file with read/write access. Prefer OSFind_OpenupW",
          R0 | OSFind_Flags: flags,
          R1 -> .String: file_name,
          R2 -> .String: path
@@ -49,10 +69,10 @@ SWI
       EXIT (R0! = OS_F: file)
    ),
 
-   OSFind_OpenoutW =
+   OSFind_OpenupWithPathW =
    (  NUMBER 13,
       ENTRY
-      (  R0 # 0x80 "Creates a new file with read/write access. Uses 32-bit file handle.",
+      (  R0 # 0xC1 "Opens an existing file with read/write access. Uses 32-bit file handle.",
          R0 | OSFind_Flags: flags,
          R1 -> .String: file_name,
          R2 -> .String: path
@@ -65,8 +85,7 @@ SWI
       ENTRY
       (  R0 # 0xC0 "Opens an existing file with read/write access. Prefer OSFind_OpenupW",
          R0 | OSFind_Flags: flags,
-         R1 -> .String: file_name,
-         R2 -> .String: path
+         R1 -> .String: file_name
       ),
       EXIT (R0! = OS_F: file)
    ),
@@ -76,8 +95,177 @@ SWI
       ENTRY
       (  R0 # 0xC0 "Opens an existing file with read/write access. Uses 32-bit file handle.",
          R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpenoutWithNoPath =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x83 "Creates a new file with read/write access. Prefer OSFind_OpenoutW",
+         R0 | OSFind_Flags: flags,
          R1 -> .String: file_name,
          R2 -> .String: path
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpenoutWithNoPathW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x83 "Creates a new file with read/write access. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpenoutWithPathVar =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x82 "Creates a new file with read/write access. Prefer OSFind_OpenoutW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpenoutWithPathVarW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x82 "Creates a new file with read/write access. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpenoutWithPath =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x81 "Creates a new file with read/write access. Prefer OSFind_OpenoutW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpenoutWithPathW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x81 "Creates a new file with read/write access. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_Openout =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x80 "Creates a new file with read/write access. Prefer OSFind_OpenoutW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpenoutW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x80 "Creates a new file with read/write access. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpeninWithNoPath =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x43 "Opens an existing file with read access only. Prefer OSFind_OpeninW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpeninWithNoPathW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x43 "Opens an existing file with read access only. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpeninWithPathVar =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x42 "Opens an existing file with read access only. Prefer OSFind_OpeninW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpeninWithPathVarW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x42 "Opens an existing file with read access only. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_OpeninWithPath =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x41 "Opens an existing file with read access only. Prefer OSFind_OpeninW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpeninWithPathW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x41 "Opens an existing file with read access only. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name,
+         R2 -> .String: path
+      ),
+      EXIT (R0! = OS_FW: file)
+   ),
+
+   OSFind_Openin =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x40 "Opens an existing file with read access only. Prefer OSFind_OpeninW",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
+      ),
+      EXIT (R0! = OS_F: file)
+   ),
+
+   OSFind_OpeninW =
+   (  NUMBER 13,
+      ENTRY
+      (  R0 # 0x40 "Opens an existing file with read access only. Uses 32-bit file handle.",
+         R0 | OSFind_Flags: flags,
+         R1 -> .String: file_name
       ),
       EXIT (R0! = OS_FW: file)
    ),

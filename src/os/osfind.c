@@ -19,21 +19,29 @@ void osfind_swi_register_extra(void)
     return;
 }
 
-/* ---- xosfind_openinw --------------------------------------------- */
+/* ---- xosfind_openup_with_no_pathw -------------------------------- */
 
-os_error *xosfind_openinw(osfind_flags flags,
+os_error *xosfind_openup_with_no_pathw(osfind_flags flags,
+    char *file_name,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openup_with_path_varw ------------------------------- */
+
+os_error *xosfind_openup_with_path_varw(osfind_flags flags,
     char *file_name,
     char *path,
     os_fw *file)
 {
     error("swi XOSFind_OpeninW '%s' unimplemented.\n", file_name);
-
-    return NULL;
+    return ERR_NO_SUCH_SWI();
 }
 
-/* ---- xosfind_openoutw -------------------------------------------- */
+/* ---- xosfind_openup_with_pathw ----------------------------------- */
 
-os_error *xosfind_openoutw(osfind_flags flags,
+os_error *xosfind_openup_with_pathw(osfind_flags flags,
     char *file_name,
     char *path,
     os_fw *file)
@@ -45,7 +53,83 @@ os_error *xosfind_openoutw(osfind_flags flags,
 
 os_error *xosfind_openupw(osfind_flags flags,
     char *file_name,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openout_with_no_pathw ------------------------------- */
+
+os_error *xosfind_openout_with_no_pathw(osfind_flags flags,
+    char *file_name,
     char *path,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openout_with_path_varw ------------------------------ */
+
+os_error *xosfind_openout_with_path_varw(osfind_flags flags,
+    char *file_name,
+    char *path,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openout_with_pathw ---------------------------------- */
+
+os_error *xosfind_openout_with_pathw(osfind_flags flags,
+    char *file_name,
+    char *path,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openoutw -------------------------------------------- */
+
+os_error *xosfind_openoutw(osfind_flags flags,
+    char *file_name,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openin_with_no_pathw -------------------------------- */
+
+os_error *xosfind_openin_with_no_pathw(osfind_flags flags,
+    char *file_name,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openin_with_path_varw ------------------------------- */
+
+os_error *xosfind_openin_with_path_varw(osfind_flags flags,
+    char *file_name,
+    char *path,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openin_with_pathw ----------------------------------- */
+
+os_error *xosfind_openin_with_pathw(osfind_flags flags,
+    char *file_name,
+    char *path,
+    os_fw *file)
+{
+    return ERR_NO_SUCH_SWI();
+}
+
+/* ---- xosfind_openinw --------------------------------------------- */
+
+os_error *xosfind_openinw(osfind_flags flags,
+    char *file_name,
     os_fw *file)
 {
     return ERR_NO_SUCH_SWI();
