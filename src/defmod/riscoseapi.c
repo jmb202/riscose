@@ -69,7 +69,8 @@ void condition(FILE* f, char* swi, def_s s)
         switch (s->op[i])
         {
           case def_OP_DISJOINS:
-            fprintf(f, "(ARM_R%d | 0x%X)", i, s->constants[i]);
+            fprintf(f, "((ARM_R%d & 0x%X) == 0x%X)",
+                i, s->constants[i], s->constants[i]);
             break;
           case def_OP_CONJOINS:
             fprintf(f, "(ARM_R%d & 0x%X)", i, s->constants[i]);
