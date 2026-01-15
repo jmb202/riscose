@@ -23,18 +23,7 @@
 #include "osfile.h"
 #include "rom/rom.h"
 #include "mem.h"
-
-static char *ro_string(const char *rostr) {
-  const char *end = rostr;
-  char *out;
-
-  while (*end > 31) end++;
-
-  out = malloc(sizeof(char) * (end-rostr+1));
-  strncpy(out, rostr, end-rostr);
-  out[end-rostr] = '\0';
-  return out;
-}
+#include "util.h"
 
 static void stat_to_regs(struct stat *statbuf,
       fileswitch_object_type *obj_type,
@@ -120,7 +109,9 @@ os_error *xosfile_save_stamped (char *file_name,
     assert(start_where == end_where);
   }
 
-  fn = ro_string(file_name);
+  fn = host_path_from_ro_path(file_name);
+  if (fn == NULL)
+    return ERR_SYS_HEAP_FULL();
 
   fd = open(fn, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
   free(fn);
@@ -356,7 +347,10 @@ os_error *xosfile_load_stamped (char *file_name,
   *size = 0;
   *attr = 0;
 
-  fn = ro_string(file_name);
+  fn = host_path_from_ro_path(file_name);
+  if (fn == NULL)
+    return ERR_SYS_HEAP_FULL();
+
 
   fd = open(fn, O_RDONLY);
   free(fn);
@@ -710,7 +704,9 @@ os_error *xosfile_read (char *file_name,
   *size = 0;
   *attr = 0;
 
-  fn = ro_string(file_name);
+  fn = host_path_from_ro_path(file_name);
+  if (fn == NULL)
+    return ERR_SYS_HEAP_FULL();
 
   if (stat(fn, &statbuf)<0) {
     free(fn);
