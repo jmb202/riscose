@@ -5,12 +5,15 @@
  *
  * Created by defmod, riscose version 1.01. */
 
+#include <fcntl.h>
 #include <stdio.h>
+#include <unistd.h>
 
 #include "monty/monty.h"
 #include "types.h"
-#include "osfind.h"
 #include "rom/rom.h"
+#include "util.h"
+#include "osfind.h"
 
 /* ---- osfind_swi_register_extra ----------------------------------- */
 
@@ -35,7 +38,6 @@ os_error *xosfind_openup_with_path_varw(osfind_flags flags,
     char *path,
     os_fw *file)
 {
-    error("swi XOSFind_OpeninW '%s' unimplemented.\n", file_name);
     return ERR_NO_SUCH_SWI();
 }
 
@@ -103,7 +105,23 @@ os_error *xosfind_openin_with_no_pathw(osfind_flags flags,
     char *file_name,
     os_fw *file)
 {
-    return ERR_NO_SUCH_SWI();
+    char *fn;
+    int fd;
+
+    if (file_name == NULL)
+        return ERR_BAD_PARAMETERS();
+
+    fn = host_path_from_ro_path(file_name);
+    if (fn == NULL)
+        return ERR_SYS_HEAP_FULL();
+
+    fd = open(fn, O_RDONLY);
+    if (fd == -1)
+        return ERR_FILE_NOT_FOUND();
+
+    *file = (os_fw) fd;
+
+    return NULL;
 }
 
 /* ---- xosfind_openin_with_path_varw ------------------------------- */
@@ -139,6 +157,9 @@ os_error *xosfind_openinw(osfind_flags flags,
 
 os_error *xosfind_closew(os_fw file)
 {
-    return ERR_NO_SUCH_SWI();
+    if (close((int) file) == -1)
+        return ERR_BAD_PARAMETERS();
+
+    return NULL;
 }
 
