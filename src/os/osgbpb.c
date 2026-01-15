@@ -6,10 +6,12 @@
  * Created by defmod, riscose version 1.01. */
 
 #include <stdio.h>
+#include <unistd.h>
 
 #include "monty/monty.h"
 #include "types.h"
 #include "rom/rom.h"
+#include "osargs.h"
 #include "osgbpb.h"
 
 /* ---- osgbpb_swi_register_extra ----------------------------------- */
@@ -56,9 +58,22 @@ os_error *xosgbpb_read_atw(os_fw file,
 os_error *xosgbpb_readw(os_fw file,
     byte *buffer,
     int32_t size,
-    int32_t *unread)
+    byte **out_buffer,
+    int32_t *unread,
+    int32_t *pointer)
 {
-    return ERR_NO_SUCH_SWI();
+    os_error *err;
+    ssize_t nread;
+
+    nread = read(file, buffer, size);
+    if (nread == -1)
+        return ERR_BAD_PARAMETERS();
+
+    *out_buffer = buffer + nread;
+    *unread = size - nread;
+    err = xosargs_read_ptrw(file, pointer);
+
+    return err;
 }
 
 /* ---- xosgbpb_read_disc_name -------------------------------------- */

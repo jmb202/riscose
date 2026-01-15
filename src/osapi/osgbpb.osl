@@ -182,9 +182,9 @@ SWI OSGBPB_ReadW =
          R3 = .Int: size
       ),
       EXIT
-      (  R2?,
+      (  R2 = .Ref .Data: out_buffer,
          R3! = .Int: unread,
-         R4?
+         R4 = .Int: pointer
    )  );
 
 SWI OSGBPB_ReadDiscName =
