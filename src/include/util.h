@@ -22,4 +22,6 @@ int file_objecttype(char *name);
 size_t file_size(char *name);
 int file_loadat(char *name, void *addr);
 
+char *host_path_from_ro_path(const char *rostr);
+
 #endif

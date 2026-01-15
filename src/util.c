@@ -61,3 +61,71 @@ int file_loadat(char *name, void *addr)
   fclose(fh);
   return 0;
 }
+
+char *host_path_from_ro_path(const char *rostr) {
+  const char *end = rostr;
+  size_t len = 0;
+  char *out, *p;
+
+  while (*end > 31) {
+    switch (*end) {
+      case '$': /* Root of disc */
+        break;
+      case '&': /* URD */
+        break;
+      case '@': /* CSD */
+        len++;
+        break;
+      case '^': /* .. */
+        len += 2;
+        break;
+      case '%': /* CSL */
+        break;
+      case '\\': /* PSD */
+        break;
+      default:
+        len++;
+        break;
+    }
+    end++;
+  }
+
+  out = malloc(len + 1);
+  if (out == NULL)
+    return NULL;
+
+  /* Unixify */
+  fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-rostr), rostr);
+  for (end = rostr, p = out; *end > 31; end++) {
+    switch (*end) {
+      case '$': /* Root of disc */
+        break;
+      case '&': /* URD */
+        break;
+      case '@': /* CSD */
+        *p++ = '.';
+        break;
+      case '^': /* .. */
+        *p++ = '.';
+        *p++ = '.';
+        break;
+      case '%': /* CSL */
+        break;
+      case '\\': /* PSD */
+        break;
+      case '/':
+        *p++ = '.';
+        break;
+      case '.':
+        *p++ = '/';
+        break;
+      default:
+        *p++ = *end;
+        break;
+    }
+  }
+  *p = '\0';
+  fprintf(stderr, "-> hpfrp: '%s'\n", out);
+
+  return out;
+}
