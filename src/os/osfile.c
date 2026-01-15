@@ -524,7 +524,30 @@ os_error *xosfile_read_stamped (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  return ERR_NO_SUCH_SWI();
+  struct stat statbuf;
+  char *fn;
+  *obj_type = 0;
+  *load_addr = 0;
+  *exec_addr = 0;
+  *size = 0;
+  *attr = 0;
+  *file_type = 0xfff;  // XXX: file type?
+
+  fn = host_path_from_ro_path(file_name);
+  if (fn == NULL)
+    return ERR_SYS_HEAP_FULL();
+
+  if (stat(fn, &statbuf)<0) {
+    free(fn);
+    return ERR_FILE_NOT_FOUND();
+  }
+  free(fn);
+  stat_to_regs(&statbuf, obj_type, load_addr, exec_addr, size, attr);
+  if (S_ISDIR(statbuf.st_mode)) {
+    *file_type = 0x1000;
+  }
+
+  return 0;
 }
 
 /* ------------------------------------------------------------------------
@@ -622,7 +645,8 @@ os_error *xosfile_read_stamped_no_path (char *file_name,
       fileswitch_attr *attr,
       bits *file_type)
 {
-  return ERR_NO_SUCH_SWI();
+  // XXX Handle lack of path
+  return xosfile_read_stamped(file_name, obj_type, load_addr, exec_addr, size, attr, file_type);
 }
 
 /* ------------------------------------------------------------------------
