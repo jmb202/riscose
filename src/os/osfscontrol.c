@@ -6,12 +6,14 @@
  * Created by defmod, riscose version 1.01. */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "monty/monty.h"
 #include "types.h"
 #include "osfscontrol.h"
 #include "rom/rom.h"
+#include "util.h"
 
 /* ---- osfscontrol_swi_register_extra ------------------------------ */
 
@@ -312,35 +314,52 @@ os_error *xosfscontrol_canonicalise_path(char *path_name,
     int size,
     int *spare)
 {
+    char *hp, *rp;
+    size_t len;
+
     //fprintf(stderr, "xosfscontrol_canonicalise_path(%p, %p, %p, %p, %d, %p)\n",
     //    path_name, buffer, var, path, size, spare);
 
     if (path_name == NULL)
         return ERR_BAD_PARAMETERS();
 
+    hp = host_path_from_ro_path(path_name);
+    if (hp == NULL)
+        return ERR_SYS_HEAP_FULL();
+
+    //fprintf(stderr, "  hp='%s'\n", hp);
+
+    rp = realpath(hp, NULL);
+    free(hp);
+    if (rp == NULL)
+        return ERR_SYS_HEAP_FULL();
+
+    //fprintf(stderr, "  rp='%s'\n", rp);
+
+    hp = ro_path_from_host_path(rp);
+    free(rp);
+    if (hp == NULL)
+        return ERR_SYS_HEAP_FULL();
+
+    len = strlen(hp);
+
+    //fprintf(stderr, "  len=%zu cp='%s'\n", len, hp);
+
     if (buffer == NULL && size == 0) {
         /* Measure length */
-        while (*path_name > 31) {
-            path_name++;
-            size--;
-        }
-	size--;
-    } else {
-        /* Canonicalise */
-        const char *orig_buffer = buffer;
-        const char *orig_path_name = path_name;
-        int orig_size = size;
-
-        while (*path_name > 31 && size > 0) {
-            *buffer++ = *path_name++;
-            size--;
-        }
-        *buffer = '\0';
-
-        //fprintf(stderr, "xosfscontrol_canonicalise_path: '%.*s' -> '%s'\n",
-        //    orig_size - size, orig_path_name, orig_buffer);
+        *spare = size - (len + 1);
+        return NULL;
+    } else if (buffer == NULL) {
+        free(hp);
+        return ERR_BAD_PARAMETERS();
+    } else if (size < (len + 1)) {
+        free(hp);
+        return ERR_BUFF_OVERFLOW();
     }
-    *spare = size;
+
+    /* Canonicalise */
+    memcpy(buffer, hp, len + 1);
+    *spare = size - len;
 
     return NULL;
 }
