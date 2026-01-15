@@ -109,8 +109,7 @@ os_error *xterritory_convert_time_to_utc_ordinals(os_date_and_time *date_and_tim
         return ERR_BAD_PARAMETERS();
 
     for (size_t i = 0; i < sizeof(*date_and_time); i++) {
-        ts <<= 8;
-        ts |= (*date_and_time)[i];
+        ts |= ((uint64_t) ((byte *) date_and_time)[i]) << (8*i);
     }
 
     ordinals->centisecond = ts % 100;
