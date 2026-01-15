@@ -62,8 +62,53 @@ int file_loadat(char *name, void *addr)
   return 0;
 }
 
-char *host_path_from_ro_path(const char *rostr) {
-  const char *end = rostr;
+char *ro_path_from_host_path(const char *hostpath)
+{
+  const char *h;
+  char *out, *p;
+
+  p = out = malloc(1 + strlen(hostpath) + 1);
+  if (out == NULL)
+    return NULL;
+
+  /* If host path is absolute, make RISC OS path so, too */
+  if (hostpath[0] == '/')
+    *p++ = '$';
+
+  for (h = hostpath; *h; h++) {
+    switch (h[0]) {
+      case '/':
+        *p++ = '.';
+        break;
+      case '.':
+	switch (h[1]) {
+          case '.':
+            /* .. -> ^ */
+            *p++ = '^';
+            h++;
+            break;
+          case '/':
+            /* . -> drop segment */
+            h++;
+            break;
+          default:
+            *p++ = '/';
+            break;
+        }
+        break;
+      default:
+        *p++ = h[0];
+        break;
+    }
+  }
+  *p = '\0';
+
+  return out;
+}
+
+char *host_path_from_ro_path(const char *ropath)
+{
+  const char *end = ropath;
   size_t len = 0;
   char *out, *p;
 
@@ -95,8 +140,8 @@ char *host_path_from_ro_path(const char *rostr) {
     return NULL;
 
   /* Unixify */
-  fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-rostr), rostr);
-  for (end = rostr, p = out; *end > 31; end++) {
+  fprintf(stderr, "hpfrp: '%.*s'\n", (int)(end-ropath), ropath);
+  for (end = ropath, p = out; *end > 31; end++) {
     switch (*end) {
       case '$': /* Root of disc */
         break;
